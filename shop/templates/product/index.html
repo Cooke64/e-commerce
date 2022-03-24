@@ -1,0 +1,19 @@
+    {% extends 'base.html' %}
+ {% block title %}
+    {% if category %}{{ category.name }}{% else %} Главная {% endif %}
+    {% endblock %}
+{% block content %}
+
+<a href="{% url 'index' %}">Главная</a><hr>
+{% for cat in cats %}
+<a href="{{ cat.get_absolute_url }}">{{ cat.name }}<hr></a>
+{% endfor %}
+{% for item in products %}
+{{ item.price }}<br>
+{{ item.category }}<br>
+<a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+    {% if item.image %}
+    <img src="{{ item.image.url }}" alt="">
+    {% endif %}
+{% endfor %}
+    {% endblock %}

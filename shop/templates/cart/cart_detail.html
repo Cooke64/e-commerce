@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}
+Козрина
+{% endblock %}
+
+{% block content %}
+{% for item in cart %}
+{% with product=item.product %}
+<a href="{{ product.get__absolute_url }}">{{ product.name }}</a>
+{% if product.images %}
+<img src=" {{ product.image.url }}">
+{% endif %}
+<form action="{% url 'item_add' product.slug %}" method="POST">
+  {% csrf_token %}
+  {{ item.update_quantity_form.quantity }}
+  {{ item.update_quantity_form.update }}
+  <input type="submit" value="Update">
+</form>
+<a href="{% url 'item_remove' product.slug %}">Удалить</a>
+{{ item.price }}
+{{ item.total_price }}
+
+{% endwith %}
+{% endfor %}
+${{ cart.get_total_price }}
+
+
+<form action="{% url 'apply' %}" method="post">
+    {{ coupon_apply_form }}
+    <input type="submit" value="Apply">
+    {% csrf_token %}
+</form>
+
+
+<a href="{% url 'index' %}" class="btn btn-default">Назад</a>
+<a href="{% url 'order_create' %}" class="btn btn-primary">К оплате</a>
+{% endblock %}
