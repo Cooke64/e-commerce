@@ -15,17 +15,21 @@ SIZE_CHOICES = (('l', 'L'),
 
 class Product(models.Model):
     name = models.CharField('Название', max_length=250)
-    brand = models.ForeignKey('Brand', on_delete=models.CASCADE)
+    brand = models.ForeignKey(
+        'Brand', on_delete=models.CASCADE, verbose_name='Брэнд'
+    )
     color = models.CharField(
         'Цвет',
         max_length=250,
         null=True,
-        choices=COLOR_CHOICES)
+        choices=COLOR_CHOICES
+    )
     size = models.CharField(
         'Размер',
         max_length=250,
         null=True,
-        choices=SIZE_CHOICES)
+        choices=SIZE_CHOICES
+    )
     price = models.DecimalField(
         'Цена', max_digits=10, decimal_places=2)
     year = models.CharField(
@@ -39,12 +43,15 @@ class Product(models.Model):
     images = models.ImageField(
         'Цвет', upload_to='products_img/', blank=True, null=True)
     category = models.ForeignKey(
-        'Category', on_delete=models.CASCADE)
+        'Category', on_delete=models.CASCADE, verbose_name='Категория'
+    )
     available = models.BooleanField(default=True)
     shop = models.ManyToManyField(
-        'Store', related_name='all_shops')
+        'Store', related_name='product_item', verbose_name='Магазины'
+    )
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 
@@ -56,8 +63,8 @@ class Product(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique=True)
+    name = models.CharField('Название', max_length=250)
+    slug = models.SlugField('Ссылка', max_length=250, unique=True)
 
     class Meta:
         verbose_name = 'Категория'
@@ -71,9 +78,9 @@ class Category(models.Model):
 
 
 class Brand(models.Model):
-    name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique=True)
-    description = models.TextField(blank=True)
+    name = models.CharField('Название', max_length=250)
+    slug = models.SlugField('Ссылка', max_length=250, unique=True)
+    description = models.TextField('Описание', blank=True)
 
     class Meta:
         verbose_name = 'Бренд'
@@ -84,10 +91,14 @@ class Brand(models.Model):
 
 
 class Store(models.Model):
-    name = models.CharField(max_length=30)
-    address = models.CharField(max_length=30)
-    contact = models.IntegerField(null=True)
-    picture = models.ImageField(upload_to='products_img/', null=True, )
+    name = models.CharField('Название', max_length=30)
+    address = models.CharField('Адрес', max_length=30)
+    contact = models.IntegerField('Контакты', null=True)
+    picture = models.ImageField('Изображение', upload_to='products_img/', null=True, )
+
+    class Meta:
+        verbose_name = 'Магазин'
+        verbose_name_plural = 'Магазины'
 
     def __str__(self):
         return self.name
@@ -96,11 +107,42 @@ class Store(models.Model):
         return f'store/{self.name}'
 
 
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+class Feedback(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='feedbacks'
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='feedbacks')
     text = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created']
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
     def __str__(self):
         return self.text[:50]
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='customer',
+        on_delete=models.CASCADE,
+        verbose_name='Покупатель',
+    )
+    product = models.ForeignKey(
+        User,
+        related_name='favourites',
+        on_delete=models.CASCADE,
+        verbose_name='Избранный товар',
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
+        constraints = [models.UniqueConstraint(
+            fields=['user', 'product'],
+            name='unique_favourites')
+        ]

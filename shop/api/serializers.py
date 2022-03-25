@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from product import models
+from product.models import Feedback
 
 
 class StoreSerializer(serializers.ModelSerializer):
@@ -27,3 +28,14 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['name', 'brand', 'price', 'category', 'available',
                   'color', 'size', 'shop']
 
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault(),
+    )
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'

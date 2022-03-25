@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 from cart.forms import CartAddProductForm
 from coupons.forms import CouponForm
-from .forms import CommentForm
-from .models import Product, Category, Brand, Comment
+from .forms import FeedbackForm
+from .models import Product, Category, Brand, Feedback
 
 
 def index(request, cat_slug=None):
@@ -40,15 +40,15 @@ def brand_page(request, brand_slug=None):
 
 def product_detail(request, product_slug):
     product = get_object_or_404(Product, slug=product_slug,)
-    comments = Comment.objects.filter(product=product.pk)
-    comment_form = CommentForm(request.POST or None)
+    feedbacks = Feedback.objects.filter(product=product.pk)
+    feedback_form = FeedbackForm(request.POST or None)
     coupon_apply_form = CouponForm()
     form = CartAddProductForm()
     context = {
         'product': product,
         'form': form,
-        'comment_form': comment_form,
-        'comments': comments,
+        'feedback_form': feedback_form,
+        'feedbacks': feedbacks,
         'coupon_apply_form': coupon_apply_form,
     }
     return render(request, 'product/product_detail.html', context)
@@ -56,7 +56,7 @@ def product_detail(request, product_slug):
 
 def add_comment(request, product_slug):
     post = get_object_or_404(Product, slug=product_slug)
-    form = CommentForm(request.POST or None)
+    form = FeedbackForm(request.POST or None)
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
