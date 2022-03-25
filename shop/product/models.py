@@ -15,9 +15,6 @@ SIZE_CHOICES = (('l', 'L'),
 
 class Product(models.Model):
     name = models.CharField('Название', max_length=250)
-    brand = models.ForeignKey(
-        'Brand', on_delete=models.CASCADE, verbose_name='Брэнд'
-    )
     color = models.CharField(
         'Цвет',
         max_length=250,
@@ -42,12 +39,23 @@ class Product(models.Model):
         'Дата', auto_now_add=True)
     images = models.ImageField(
         'Цвет', upload_to='products_img/', blank=True, null=True)
+    brand = models.ForeignKey(
+        'Brand',
+        on_delete=models.CASCADE,
+        related_name='products',
+        verbose_name='Брэнд'
+    )
     category = models.ForeignKey(
-        'Category', on_delete=models.CASCADE, verbose_name='Категория'
+        'Category',
+        on_delete=models.CASCADE,
+        related_name='products',
+        verbose_name='Категория'
     )
     available = models.BooleanField(default=True)
     shop = models.ManyToManyField(
-        'Store', related_name='product_item', verbose_name='Магазины'
+        'Store',
+        related_name='product_item',
+        verbose_name='Магазины',
     )
 
     class Meta:
@@ -92,9 +100,9 @@ class Brand(models.Model):
 
 class Store(models.Model):
     name = models.CharField('Название', max_length=30)
-    address = models.CharField('Адрес', max_length=30)
-    contact = models.IntegerField('Контакты', null=True)
-    picture = models.ImageField('Изображение', upload_to='products_img/', null=True, )
+    address = models.CharField('Адрес', max_length=30, null=True, blank=True)
+    contact = models.IntegerField('Контакты', null=True, blank=True)
+    picture = models.ImageField('Изображение', upload_to='products_img/', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Магазин'

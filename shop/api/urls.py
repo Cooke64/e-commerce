@@ -7,7 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'categories', CategoryViewSet)
 router.register(r'stores', StoreViewSet)
-router.register(r'feedbacks', FeedbackViewSet, basename='products_feeds')
+router.register(r'feedbacks', FeedbackViewSet,)
 
 urlpatterns = [
     path('', include(router.urls)),
