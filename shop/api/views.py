@@ -1,15 +1,22 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.response import Response
 
 from product.models import Product, Category, Store, Feedback
 from .serializers import ProductSerializer, CategorySerializer, \
-    StoreSerializer, FeedbackSerializer
+    StoreSerializer, FeedbackSerializer, ProductListSerializer
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProductListSerializer
+        return ProductSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

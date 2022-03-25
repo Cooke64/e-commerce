@@ -37,6 +37,13 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = ['user', 'product', 'text']
 
 
+class ProductListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Product
+        fields = ('name', 'price', 'available', 'url')
+
+
 class ProductSerializer(serializers.ModelSerializer):
     color = serializers.ChoiceField(choices=models.COLOR_CHOICES)
     size = serializers.ChoiceField(choices=models.SIZE_CHOICES)
