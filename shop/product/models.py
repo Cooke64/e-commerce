@@ -14,23 +14,35 @@ SIZE_CHOICES = (('l', 'L'),
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField('Название', max_length=250)
     brand = models.ForeignKey('Brand', on_delete=models.CASCADE)
-    color = models.CharField(max_length=250, blank=True, null=True,
-                             choices=COLOR_CHOICES)
-    size = models.CharField(max_length=250, blank=True, null=True,
-                            choices=SIZE_CHOICES)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    year = models.CharField(max_length=250, blank=True, null=True)
-    slug = models.SlugField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    create_date = models.DateTimeField(auto_now_add=True)
-    images = models.ImageField(upload_to='products_img/', blank=True, null=True)
+    color = models.CharField(
+        'Цвет',
+        max_length=250,
+        null=True,
+        choices=COLOR_CHOICES)
+    size = models.CharField(
+        'Размер',
+        max_length=250,
+        null=True,
+        choices=SIZE_CHOICES)
+    price = models.DecimalField(
+        'Цена', max_digits=10, decimal_places=2)
+    year = models.CharField(
+        'Год выпуска', max_length=250, blank=True, null=True)
+    slug = models.SlugField(
+        'Ссылка', max_length=100, unique=True)
+    description = models.TextField(
+        'Описание', blank=True)
+    create_date = models.DateTimeField(
+        'Дата', auto_now_add=True)
+    images = models.ImageField(
+        'Цвет', upload_to='products_img/', blank=True, null=True)
     category = models.ForeignKey(
         'Category', on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
-    store = models.ForeignKey(
-        'Store', on_delete=models.CASCADE)
+    shop = models.ManyToManyField(
+        'Store', related_name='all_shops')
 
     class Meta:
         verbose_name = 'Товар'
@@ -75,8 +87,7 @@ class Store(models.Model):
     name = models.CharField(max_length=30)
     address = models.CharField(max_length=30)
     contact = models.IntegerField(null=True)
-    products = models.ManyToManyField(Product, blank=True)
-    picture = models.ImageField(upload_to='products_img/', null=True)
+    picture = models.ImageField(upload_to='products_img/', null=True, )
 
     def __str__(self):
         return self.name

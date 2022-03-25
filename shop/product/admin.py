@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category, Brand
+from .models import Product, Category, Brand, Store
 
 
 @admin.register(Product)
@@ -10,7 +10,7 @@ class ProductAdmin(admin.ModelAdmin):
         'brand',
         'price',
         'create_date',
-        'category'
+        'category',
     )
     search_fields = ('name', 'brand', 'price')
     list_editable = ('category',)
@@ -19,18 +19,25 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(Category)
-class GroupAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'slug',
     )
-    prepopulated_fields = {"name": ("slug",)}
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'name',
-        'slug',
     )
-    prepopulated_fields = {"name": ("slug",)}
+
+
+@admin.register(Store)
+class StoreAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+    )
