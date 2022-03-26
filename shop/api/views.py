@@ -9,7 +9,7 @@ from .serializers import ProductSerializer, CategorySerializer, \
     StoreSerializer, FeedbackSerializer, ProductListSerializer
 
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 

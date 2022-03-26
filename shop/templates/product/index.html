@@ -15,5 +15,11 @@
     {% if item.image %}
     <img src="{{ item.image.url }}" alt="">
     {% endif %}
-{% endfor %}
+    {% endfor %}
+
+    <h2>Only with review</h2>
+    {% for item in only_with_feedback %}
+    <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+    {% endfor %}
+
     {% endblock %}

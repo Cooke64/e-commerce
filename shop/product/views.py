@@ -11,14 +11,17 @@ def index(request, cat_slug=None):
     products = Product.objects.filter(available=True)
     if cat_slug:
         category = get_object_or_404(Category, slug=cat_slug)
-        products = products.filter(category=category)
+        products = Product.objects.select_related('category').filter(category=category)
     else:
         category = None
+    only_with_feedback = Product.objects.filter(feedbacks__isnull=False)
     context = {
         'cats': cats,
         'category': category,
-        'products': products
+        'products': products,
+        'only_with_feedback': only_with_feedback
     }
+
     return render(request, 'product/index.html', context)
 
 
@@ -26,7 +29,7 @@ def brand_page(request, brand_slug=None):
     brands = Brand.objects.all()
     if brand_slug:
         brand = get_object_or_404(Brand, slug=brand_slug)
-        products = Product.objects.filter(brand=brand)
+        products = Product.objects.select_related('brand').filter(brand=brand)
     else:
         brand = None
         products = None
@@ -50,18 +53,19 @@ def product_detail(request, product_slug):
         'feedback_form': feedback_form,
         'feedbacks': feedbacks,
         'coupon_apply_form': coupon_apply_form,
+
     }
     return render(request, 'product/product_detail.html', context)
 
 
 def add_comment(request, product_slug):
-    post = get_object_or_404(Product, slug=product_slug)
+    product = get_object_or_404(Product, slug=product_slug)
     form = FeedbackForm(request.POST or None)
     if form.is_valid():
-        comment = form.save(commit=False)
-        comment.author = request.user
-        comment.post = post
-        comment.save()
+        feedback = form.save(commit=False)
+        feedback.author = request.user
+        feedback.product = product
+        feedback.save()
     return redirect('product_detail', slug=product_slug)
 
 
