@@ -1,9 +1,30 @@
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView
 
 from cart.forms import CartAddProductForm
 from coupons.forms import CouponForm
 from .forms import FeedbackForm
 from .models import Product, Category, Brand, Feedback
+
+
+class SearchResultsView(ListView):
+    model = Product
+    template_name = 'product/search_result.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q')
+        return context
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        object_list = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(brand__name__icontains=query)
+        )
+        return object_list
 
 
 def index(request, cat_slug=None):
@@ -14,7 +35,7 @@ def index(request, cat_slug=None):
         products = Product.objects.select_related('category').filter(category=category)
     else:
         category = None
-    only_with_feedback = Product.objects.filter(feedbacks__isnull=False)
+    only_with_feedback = Product.objects.filter(feedbacks__isnull=False).distinct()
     context = {
         'cats': cats,
         'category': category,

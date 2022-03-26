@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+ {% block title %}
+{{ q }}
+ {% endblock %}
+{% block content %}
+Результаты запроса {{ q }}
+<hr>
+{% for item in object_list %}
+<a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+{% endfor %}
+{% endblock %}

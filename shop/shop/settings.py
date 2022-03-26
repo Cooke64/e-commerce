@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'orders',
     'coupons',
     'api',
+    'customer',
 
 ]
 
@@ -119,3 +120,5 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ]
 }
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

@@ -4,6 +4,13 @@
   <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
+{% if request.user.is_authenticated %}
+<a href="{% url 'logout_user' %}">Выйти</a>
+{% else %}
+<a href="{% url 'login_user' %}">Войти</a>
+{% endif %}
+<br>
+<br>
     {% with total_items=cart|length %}
         {% if cart|length > 0 %}
             Your cart:
@@ -17,7 +24,10 @@
     {% endwith %}
     <br>
 {% block content %}
-
 {% endblock %}
+<form class="d-flex" action="{% url 'search_results' %}" method="get">
+        <input class="form-control me-2" name="q" type="text" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit">Искать</button>
+</form>
 </body>
 </html>
