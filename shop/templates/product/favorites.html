@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+ {% block title %}
+Избранное
+ {% endblock %}
+{% block content %}
+{% for item in favs %}
+    <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+    {{ item.name }}<br>
+    {{ item.price }}<br>
+    {% if item.image %}
+    <img src="{{ item.image.url }}" alt="">
+    {% endif %}
+{% endfor %}
+{% endblock %}

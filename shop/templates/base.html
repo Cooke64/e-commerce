@@ -2,32 +2,43 @@
 <html lang="en">
 <head>
   <title>{% block title %} {% endblock %}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
+<form class="d-flex" action="{% url 'search_results' %}" method="get">
+        <input class="form-control me-2" name="q" type="text" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit">Искать</button>
+</form>
+<hr>
 {% if request.user.is_authenticated %}
+hello {{ request.user.username }}
 <a href="{% url 'logout_user' %}">Выйти</a>
+<a href="{% url 'user_profile' %}">Профиль</a>
 {% else %}
 <a href="{% url 'login_user' %}">Войти</a>
+<a href="{% url 'signup' %}">Регистрация</a>
 {% endif %}
 <br>
 <br>
     {% with total_items=cart|length %}
         {% if cart|length > 0 %}
-            Your cart:
+            В корзине:
             <a href="{% url 'cart_detail' %}">
-                {{ total_items }} item{{ total_items|pluralize }},
-                ${{ cart.get_total_price }}
+                {{ total_items }} предметов {{ total_items|pluralize }}, ценой
+                ${{ cart.get_total_price }} рублей
             </a>
         {% else %}
-            Your cart is empty.
+            Корзина пустая.
         {% endif %}
     {% endwith %}
     <br>
-{% block content %}
-{% endblock %}
-<form class="d-flex" action="{% url 'search_results' %}" method="get">
-        <input class="form-control me-2" name="q" type="text" aria-label="Search">
-        <button class="btn btn-outline-secondary" type="submit">Искать</button>
-</form>
+    <main role="main" class="container">
+      <div class="row">
+        <div class="col-md-8">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </div>
+    </main>
 </body>
 </html>

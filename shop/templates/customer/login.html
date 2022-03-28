@@ -1,25 +1,39 @@
 {% extends 'base.html' %}
- {% block title %}
-Login
- {% endblock %}
+{% load crispy_forms_tags %}
+{% block title %}
+{% if signup_is_true %} Signup {% else %} Login {% endif %}
+{% endblock %}
 {% block content %}
-
-{% if messages %}
-<ul>
+<div class="content-section">
+  {% if messages %}
+  <ul>
     {% for message in messages %}
     <li style="color: red">{{ message }}</li>
     {% endfor %}
-</ul>
-{% endif %}
-
-<div>
-  <form method="POST" action="">
-    {% csrf_token %}
-    <label>Username</label>
-    <input type="text" name="username" placeholder="Enter">
-    <label>password</label>
-    <input type="password" name="password" placeholder="password">
-    <input type="submit" value="Login">
-  </form>
+  </ul>
+  {% endif %}
+  {% if signup_is_true %}
+  <h1>Регистрация</h1>
+  <div>
+    <form method="POST" action="">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <div class="form-group">
+        <button class="btn btn-outline-info" type="submit">Sign Up</button>
+      </div>
+    </form>
+  </div>
+  {% else %}
+  <h1>Войти</h1>
+  <div>
+    <form method="POST" action="">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <div class="form-group">
+        <button class="btn btn-outline-info" type="submit">Login</button>
+      </div>
+    </form>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

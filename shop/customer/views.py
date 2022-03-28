@@ -1,31 +1,58 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse_lazy
+
+from cart.cart import Cart
+from customer.forms import UserRegisterForm, UserEnterForm
 
 
-def login_user(request):
-    if request.user.is_authenticated:
-        return redirect('index')
+class LoginUser(LoginView):
+    form_class = AuthenticationForm
+    template_name = 'customer/login.html'
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        try:
-            User.objects.get(username=username)
-        except:
-            messages.error(request, 'You arent part of our shop')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('index')
-        else:
-            messages.error(request, 'password is not valid')
-    context = {
-    }
-    return render(request, 'customer/login.html', context)
+    def get_success_url(self):
+        return reverse_lazy('index')
 
 
 def logout_user(request):
     logout(request)
-    return redirect('login_user')
+    return redirect('index')
+
+
+def signup(request):
+    signup_is_true = True
+    form = UserRegisterForm()
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username
+            user.save()
+            login(request, user)
+            return redirect('index')
+        else:
+            messages.error(request, 'Something went wrong')
+    context = {
+        'signup_is_true': signup_is_true,
+        'form': form
+    }
+    return render(request, 'customer/login.html', context)
+
+
+@login_required(login_url='login_user')
+def user_profile(request):
+    user = request.user
+    cart = Cart(request)
+    context = {
+        'user': user,
+        'cart': cart
+    }
+    return render(request, 'customer/profile.html', context)
+
+
+

@@ -1,9 +1,10 @@
+from django.contrib.auth.models import User
 from django.db import models
 
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-User = get_user_model()
+from customer.models import Customer
+
 
 COLOR_CHOICES = (('желтый', 'желтый'),
                 ('не желтый', 'не желтый'),
@@ -150,21 +151,22 @@ class Feedback(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(
         User,
-        related_name='customer',
+        related_name='who_likes_items',
         on_delete=models.CASCADE,
         verbose_name='Покупатель',
     )
     product = models.ForeignKey(
-        User,
+        Product,
         related_name='favourites',
         on_delete=models.CASCADE,
         verbose_name='Избранный товар',
     )
 
+
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [models.UniqueConstraint(
-            fields=['user', 'product'],
+            fields=['user', 'product',],
             name='unique_favourites')
         ]

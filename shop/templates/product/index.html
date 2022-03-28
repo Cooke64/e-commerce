@@ -1,25 +1,29 @@
-   {% extends 'base.html' %}
- {% block title %}
-    {% if category %}{{ category.name }}{% else %} Главная {% endif %}
-    {% endblock %}
+{% extends 'base.html' %}
+{% block title %}
+{% if category %}{{ category.name }}{% else %} Главная {% endif %}
+{% endblock %}
 {% block content %}
 
-<a href="{% url 'index' %}">Главная</a><hr>
-{% for cat in cats %}
-<a href="{{ cat.get_absolute_url }}">{{ cat.name }}<hr></a>
-{% endfor %}
+<a href="{% url 'index' %}">Главная</a>
+<hr>
+{% if request.user.is_authenticated %}
+    {% for cat in cats %}
+    <a href="{{ cat.get_absolute_url }}">{{ cat.name }}
+    </a>
+<hr>
+    {% endfor %}
+{% endif %}
 {% for item in products %}
-{{ item.price }}<br>
-{{ item.category }}<br>
-<a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+    <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+    {{ item.price }}<br>
     {% if item.image %}
     <img src="{{ item.image.url }}" alt="">
     {% endif %}
-    {% endfor %}
+{% endfor %}
 
-    <h2>Only with review</h2>
-    {% for item in only_with_feedback %}
-    <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
-    {% endfor %}
+<h2>Only with review</h2>
+{% for item in only_with_feedback %}
+  <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+{% endfor %}
 
-    {% endblock %}
+{% endblock %}

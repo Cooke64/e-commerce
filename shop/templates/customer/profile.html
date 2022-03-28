@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+ {% block title %}
+Login
+ {% endblock %}
+{% block content %}
+<h1> {{ user.username }} </h1>
+<h3>{{ user.customer.address }}</h3>
+
+
+{% for item in cart %}
+{{ item.name }}
+{{ item.total_price }}
+{% endfor %}
+<a href="{% url 'cart_detail' %}">К корзине</a>
+<a href="{% url 'favorites_items' %}">Избранное</a>
+{% endblock %}
