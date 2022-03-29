@@ -1,12 +1,12 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
 
 class Customer(models.Model):
-    user = models.OneToOneField(User, null=True, blank=True,
-                                on_delete=models.CASCADE)
-
-    phone = models.IntegerField(
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    phone = models.CharField(
+        max_length=30,
         null=True,
         blank=True,)
     address = models.TextField(
@@ -24,7 +24,7 @@ class Customer(models.Model):
         default=0)
 
     def __str__(self):
-        return str(self.user)
+        return self.user
 
     def get_discount(self):
         if self.spent_money < 10:

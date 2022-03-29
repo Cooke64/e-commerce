@@ -5,13 +5,7 @@
 {% endblock %}
 {% block content %}
 <div class="content-section">
-  {% if messages %}
-  <ul>
-    {% for message in messages %}
-    <li style="color: red">{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
+{% include 'includes/messages.html' %}
   {% if signup_is_true %}
   <h1>Регистрация</h1>
   <div>
