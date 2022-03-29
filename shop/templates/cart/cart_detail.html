@@ -17,14 +17,24 @@
   <input type="submit" value="Update">
 </form>
 <a href="{% url 'item_remove' product.slug %}">Удалить</a>
-{{ item.price }}
-{{ item.total_price }}
-
+<h3>Цена товара '{{ product }}' составляет {{ item.price }}</h3>
+<h3>Цена всех товаров '{{ product }}' составляет {{ item.total_price }}</h3>
 {% endwith %}
 {% endfor %}
-${{ cart.get_total_price }}
 
-
+<h3>
+Без учета скидки:{{ cart.get_total_price }}
+</h3>
+<h3>
+  С учетом вашей скидки: {{ cart.get_total_price_after_discount|floatformat:2 }}
+</h3>
+{% if cart.get_discount %}
+<h3>
+  С учетом купона: {{ cart.price_with_coupon|floatformat:2 }}
+  <p style="color:red;">  Скидка по данному промокоду составляет ({{ cart.coupon.discount }}%)
+            <span>- {{ cart.get_discount|floatformat:"2" }} рублей</span></p>
+</h3>
+{% endif %}
 <form action="{% url 'apply' %}" method="post">
     {{ coupon_apply_form }}
     <input type="submit" value="Apply">
@@ -32,6 +42,6 @@ ${{ cart.get_total_price }}
 </form>
 
 
-<a href="{% url 'index' %}" class="btn btn-default">Назад</a>
+<a href="{% url 'index' %}" class="btn btn-default">Главная</a>
 <a href="{% url 'order_create' %}" class="btn btn-primary">К оплате</a>
 {% endblock %}

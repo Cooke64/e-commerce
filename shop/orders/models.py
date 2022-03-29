@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from customer.models import Customer
 from product.models import Product
 
 User = get_user_model()
@@ -41,4 +42,4 @@ class OrderItem(models.Model):
         return self.pk
 
     def get_cost(self):
-        return self.price * self.quantity
+        return (self.price * self.quantity)

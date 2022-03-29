@@ -16,13 +16,13 @@
 <span>{{ item.total_price }}</span>
 
 {% endfor %}
-{% if cart.coupon %}
-${{ cart.get_total_price }}
-"{{ cart.coupon.code }}" coupon
-({{ cart.coupon.discount }}% off)
-            - ${{ cart.get_discount|floatformat:"2" }}
+<h3>
+  С учетом вашей скидки: {{ cart.get_total_price_after_discount|floatformat:2 }}
+</h3>
+{% if cart.get_discount %}
+<h3>
+  С учетом купона: {{ cart.price_with_coupon|floatformat:2 }}
+</h3>
 {% endif %}
-        ${{ cart.get_total_price_after_discount|floatformat:"2" }}
-
 
 {% endblock %}

@@ -24,8 +24,7 @@ hello {{ request.user.username }}
         {% if cart|length > 0 %}
             В корзине:
             <a href="{% url 'cart_detail' %}">
-                {{ total_items }} предметов {{ total_items|pluralize }}, ценой
-                ${{ cart.get_total_price }} рублей
+                {{ total_items }}
             </a>
         {% else %}
             Корзина пустая.

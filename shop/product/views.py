@@ -23,7 +23,7 @@ class SearchResultsView(ListView):
         object_list = Product.objects.filter(
             Q(name__icontains=query) |
             Q(description__icontains=query)
-        ).values('name', 'slug', )
+        )
         return object_list
 
 
@@ -41,16 +41,32 @@ def index(request, cat_slug=None):
                     )
     else:
         category = None
-    # Выводим только те товары, которые имеют отзывы
-    only_with_feedback = Product.objects.filter(
-        feedbacks__isnull=False).distinct()
+    if "all_items" in request.GET:
+        # Сортировка всех доступных продуктов
+        products = (Product.objects.
+                    select_related('category')
+                    .filter(available=True)
+                    )
+    elif "with_feeds" in request.GET:
+        # Выбирает товары только с отзывами
+        products = (Product.objects
+                    .filter(feedbacks__isnull=False)
+                    .distinct())
+    elif 'max_price' in request.GET:
+        # Сортирует по максимальной цене
+        products = (Product.objects
+                    .order_by('-price')
+                    .select_related('category'))
+    elif 'min_price' in request.GET:
+        # Сортирует по минимальной цене
+        products = (Product.objects
+                    .order_by('price')
+                    .select_related('category'))
     context = {
         'cats': cats,
         'category': category,
         'products': products,
-        'only_with_feedback': only_with_feedback
     }
-
     return render(request, 'product/index.html', context)
 
 

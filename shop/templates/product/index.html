@@ -3,7 +3,24 @@
 {% if category %}{{ category.name }}{% else %} Главная {% endif %}
 {% endblock %}
 {% block content %}
+<script>
+    let all_items = document.getElementById('all_items')
+    let with_feeds = document.getElementById('with_feeds')
+    let max_price = document.getElementById('max_price')
+    let min_price = document.getElementById('min_price')
 
+    all_items.addEventListener('submit', function(){
+        alert("Вы нажали на кнопку");
+        }
+    )
+</script>
+<form action="/" method="GET">
+    {% csrf_token %}
+<button class="btn btn-outline-secondary" id='all_items' name='all_items' type="submit">Все товары</button>
+<button class="btn btn-outline-secondary" id='with_feeds' name='with_feeds' type="submit">Только с отзывом</button>
+<button class="btn btn-outline-secondary" id='max_price' name='max_price' type="submit">По цене мах</button>
+<button class="btn btn-outline-secondary" id='min_price' name='min_price' type="submit">По цене min</button>
+</form>
 <a href="{% url 'index' %}">Главная</a>
 <hr>
 {% if request.user.is_authenticated %}
@@ -20,10 +37,4 @@
     <img src="{{ item.image.url }}" alt="">
     {% endif %}
 {% endfor %}
-
-<h2>Only with review</h2>
-{% for item in only_with_feedback %}
-  <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
-{% endfor %}
-
 {% endblock %}

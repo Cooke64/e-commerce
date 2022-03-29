@@ -5,6 +5,8 @@ Login
 {% block content %}
 <h1> {{ user.username }} </h1>
 <h3>{{ user.customer.address }}</h3>
+<h3>{{ user.customer.spent_money }}</h3>
+<h3> Размер скидки составляет: {{ user.customer.get_discount }}% </h3>
 
 
 {% for item in cart %}

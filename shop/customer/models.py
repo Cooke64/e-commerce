@@ -5,11 +5,7 @@ from django.db import models
 class Customer(models.Model):
     user = models.OneToOneField(User, null=True, blank=True,
                                 on_delete=models.CASCADE)
-    status = models.CharField(
-        'Статус',
-        max_length=250,
-        default=0
-    )
+
     phone = models.IntegerField(
         null=True,
         blank=True,)
@@ -23,7 +19,18 @@ class Customer(models.Model):
         null=True,
         blank=True,
     )
+    spent_money = models.IntegerField(
+        'Потрачено денег',
+        default=0)
 
     def __str__(self):
         return str(self.user)
 
+    def get_discount(self):
+        if self.spent_money < 10:
+            discount = 5
+        elif self.spent_money < 20:
+            discount = 10
+        else:
+            discount = 15
+        return discount

@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 
 from cart.cart import Cart
 from customer.forms import UserRegisterForm, UserEnterForm
+from customer.models import Customer
 
 
 class LoginUser(LoginView):

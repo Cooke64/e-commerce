@@ -36,7 +36,7 @@
     {% endif %}
     {% endif %}
 <hr>
-<h5 class="card-header">Все комментарии:</h5>
+<h5 class="card-header">Все отзывы:</h5>
 <br>
 {% for item in feedbacks %}
 {{ item.text }}
@@ -45,7 +45,7 @@
 <br>
 
 {% if request.user.is_authenticated %}
-<h5 class="card-header">Добавить комментарий:</h5>
+<h5 class="card-header">Добавить отзыв:</h5>
     <form method="POST" action="{% url 'add_feedback' product.slug %}">
         {%csrf_token %}
         {{ feedback_form }}

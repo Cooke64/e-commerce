@@ -7,5 +7,5 @@ from customer.models import Customer
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'user',
-        'status',
+        'spent_money',
     )

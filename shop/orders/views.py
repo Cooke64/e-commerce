@@ -1,5 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from django.shortcuts import render
+
+from customer.models import Customer
 from .models import OrderItem
 from .forms import OrderCreateForm
 from cart.cart import Cart
@@ -17,12 +20,15 @@ def order_create(request):
                                          product=item['product'],
                                          price=item['price'],
                                          quantity=item['quantity'])
-            # очистка корзины
+                (Customer.objects
+                 .filter(user=request.user)
+                 .update(spent_money=F('spent_money') + (item['price'] * item['quantity']),))
             cart.clear()
-            return render(request, 'order/check_out.html',
+            return render(request, 'index',
                           {'order': order})
     else:
         form = OrderCreateForm
-
-    return render(request, 'order/order_create.html',
-                  {'cart': cart, 'form': form})
+    context = {
+        'cart': cart, 'form': form
+    }
+    return render(request, 'order/order_create.html', context)
