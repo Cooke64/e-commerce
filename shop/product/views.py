@@ -27,7 +27,7 @@ class SearchResultsView(ListView):
         return object_list
 
 
-def index(request, cat_slug=None):
+def product_list(request, cat_slug=None):
     cats = Category.objects.all()
     products = (Product.objects.
                 select_related('category')
