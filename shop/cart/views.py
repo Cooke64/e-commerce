@@ -35,11 +35,13 @@ def cart_remove(request, product_slug):
 def cart_detail(request):
     cart = Cart(request)
     coupon_apply_form = CouponApplyForm()
+
     for item in cart:
         item['update_quantity_form'] = CartAddProductForm(
             initial={'quantity': item['quantity'], 'update': True})
+
     context = {
         'cart': cart,
-        'coupon_apply_form': coupon_apply_form
+        'coupon_apply_form': coupon_apply_form,
     }
     return render(request, 'cart/cart_detail.html', context)

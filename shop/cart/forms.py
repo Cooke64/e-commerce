@@ -7,5 +7,7 @@ class CartAddProductForm(forms.Form):
         required=False, initial=False, widget=forms.HiddenInput
     )
 
+
 class CouponApplyForm(forms.Form):
     code = forms.CharField()
+

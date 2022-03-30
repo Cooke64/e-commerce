@@ -4,6 +4,20 @@
     {% endblock %}
 
 {% block content %}
+
+<h2>ДОбавить оценку</h2>
+<h5>Total like are {{liker.res|floatformat:2}}</h5>
+{% if request.user.is_authenticated%}
+{% if not user_likes %}
+
+    <form method="POST" action="{% url 'add_score' product.slug %}">
+        {%csrf_token %}
+        {{ add_score_form }}
+        <hr>
+        <button type="submit" class="btn btn-primary"> оценить </button>
+    </form>
+{% endif %}
+{% endif %}
 <h3>{{ product.name }}</h3>
 <h6><a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></h6>
 <p>{{ product.price }}</p>
@@ -18,33 +32,26 @@
 
 {% if request.user.is_authenticated %}
     {% if in_fave %}
-    <a
-            class="btn btn-lg btn-light"
-            href="{% url 'stop_being_fav' product.slug %}"
-            role="button"
-    >
+    <a class="btn btn-lg btn-light" href="{% url 'stop_being_fav' product.slug %}" role="button">
       Удалить из избранного
     </a>
     {% else %}
-    <a
-            class="btn btn-lg btn-primary"
-            href="{% url 'add_item_in_fav' product.slug %}"
-            role="button"
-    >
+    <a class="btn btn-lg btn-primary" href="{% url 'add_item_in_fav' product.slug %}" role="button">
       Добавить в избранное
     </a>
     {% endif %}
-    {% endif %}
+{% endif %}
 <hr>
 <h5 class="card-header">Все отзывы:</h5>
 <br>
 {% for item in feedbacks %}
-{{ item.text }}
+    {{ item.text }}
 <hr>
 {% endfor %}
 <br>
 
 {% if request.user.is_authenticated %}
+
 <h5 class="card-header">Добавить отзыв:</h5>
     <form method="POST" action="{% url 'add_feedback' product.slug %}">
         {%csrf_token %}

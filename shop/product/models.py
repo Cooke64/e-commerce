@@ -1,17 +1,15 @@
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from django.urls import reverse
 
-from customer.models import Customer
-
-
 COLOR_CHOICES = (('желтый', 'желтый'),
-                ('не желтый', 'не желтый'),
-                )
+                 ('не желтый', 'не желтый'),
+                 )
 SIZE_CHOICES = (('l', 'L'),
-               ('XS', 'XS'),
-               )
+                ('XS', 'XS'),
+                )
 
 
 class Product(models.Model):
@@ -72,6 +70,7 @@ class Product(models.Model):
         null=True,
         blank=True,
     )
+    like = models.ManyToManyField('Likes', related_name="products")
 
     class Meta:
         ordering = ['name']
@@ -83,6 +82,25 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
+
+
+RATE_CHOICES = [
+    (1, '1 - Trash'),
+    (2, '2 - Horrible'),
+    (3, '3 - Terrible'),
+    (4, '4 - Bad'),
+    (5, '5 - OK'),
+]
+
+
+class Likes(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='likes'
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='likes')
+    date = models.DateTimeField(auto_now_add=True)
+    score = models.IntegerField(choices=RATE_CHOICES, default=1)
 
 
 class Category(models.Model):
@@ -117,7 +135,8 @@ class Store(models.Model):
     name = models.CharField('Название', max_length=30)
     address = models.CharField('Адрес', max_length=30, null=True, blank=True)
     contact = models.IntegerField('Контакты', null=True, blank=True)
-    picture = models.ImageField('Изображение', upload_to='products_img/', null=True, blank=True)
+    picture = models.ImageField('Изображение', upload_to='products_img/',
+                                null=True, blank=True)
 
     class Meta:
         verbose_name = 'Магазин'
@@ -162,11 +181,10 @@ class Favorite(models.Model):
         verbose_name='Избранный товар',
     )
 
-
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [models.UniqueConstraint(
-            fields=['user', 'product',],
+            fields=['user', 'product', ],
             name='unique_favourites')
         ]

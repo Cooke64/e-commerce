@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 
 from cart.forms import CartAddProductForm
 from coupons.forms import CouponForm
-from .forms import FeedbackForm
-from .models import Product, Category, Feedback, Favorite
+from .forms import FeedbackForm, RateForm
+from .models import Product, Category, Feedback, Favorite, Likes
 
 
 class SearchResultsView(ListView):
@@ -71,7 +71,19 @@ def product_list(request, cat_slug=None):
 
 
 def product_detail(request, product_slug):
-    product = get_object_or_404(Product, slug=product_slug, )
+    user_likes =None
+    product = (Product.objects
+               .select_related('category')
+               .prefetch_related('likes')
+               .get(slug=product_slug)
+               )
+
+    liker = product.likes.aggregate(res=Avg('score'))
+
+    if request.user.is_authenticated:
+        user = request.user
+        user_likes = Likes.objects.filter(product=product.pk, user=user)
+
     feedbacks = Feedback.objects.filter(product=product.pk)
     in_fave = Favorite.objects.filter(
         user=request.user.pk,
@@ -79,14 +91,18 @@ def product_detail(request, product_slug):
     ).exists()
     feedback_form = FeedbackForm(request.POST or None)
     coupon_apply_form = CouponForm()
+    add_score_form = RateForm()
     form = CartAddProductForm()
     context = {
+        'liker': liker,
+        'user_likes': user_likes,
         'product': product,
         'form': form,
         'feedback_form': feedback_form,
         'feedbacks': feedbacks,
         'coupon_apply_form': coupon_apply_form,
-        'in_fave': in_fave
+        'in_fave': in_fave,
+        'add_score_form': add_score_form
     }
     return render(request, 'product/product_detail.html', context)
 
@@ -136,3 +152,14 @@ def stop_being_fav(request, product_slug):
     if fav_in_bd.exists():
         fav_in_bd.delete()
     return redirect('product_detail', product_slug=product_slug)
+
+
+def add_score(request, product_slug):
+    product = Product.objects.get(slug=product_slug)
+    if request.method == 'POST':
+        form = RateForm(request.POST)
+        score = form.save(commit=False)
+        score.user = request.user
+        score.product = product
+        score.save()
+        return redirect('product_detail', product_slug=product_slug)

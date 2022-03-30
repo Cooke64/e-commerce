@@ -27,4 +27,9 @@ urlpatterns = [
         views.stop_being_fav,
         name='stop_being_fav'
     ),
+    path(
+        'product/<slug:product_slug>/add_score/',
+        views.add_score,
+        name='add_score'
+    ),
 ]
