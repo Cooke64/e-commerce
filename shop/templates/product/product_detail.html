@@ -1,11 +1,9 @@
 {% extends 'base.html' %}
-{% load cache %}
  {% block title %}
 {{ product.name }}
     {% endblock %}
 
 {% block content %}
-{% cache 20 content %}
 <h2>{{ product.name }}</h2>
 <div class="review-feedback">
                 <span class="fa fa-star {% if product.get_average_likes > 0 %} checked {% endif %}"></span>
@@ -63,5 +61,4 @@
         <button type="submit" class="btn btn-primary"> Добавить </button>
     </form>
 {% endif %}
-{% endcache %}
 {% endblock %}

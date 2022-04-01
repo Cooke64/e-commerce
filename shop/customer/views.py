@@ -1,18 +1,18 @@
+from django.contrib import messages
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth import login, logout
 from django.urls import reverse_lazy
 
 from cart.cart import Cart
-from core.logger import loger_errors
 from customer.forms import (
     UserRegisterForm,
     UserEditForm,
     ProfileEditForm)
 from customer.models import Customer
+from orders.models import OrderItem
 
 
 class LoginUser(LoginView):
@@ -23,13 +23,11 @@ class LoginUser(LoginView):
         return reverse_lazy('index')
 
 
-@loger_errors
 def logout_user(request):
     logout(request)
-    return redirect('index1')
+    return redirect('index')
 
 
-@loger_errors
 def signup(request):
     signup_is_true = True
     form = UserRegisterForm()
@@ -51,24 +49,25 @@ def signup(request):
     return render(request, 'customer/login.html', context)
 
 
-@loger_errors
 @login_required(login_url='login_user')
 def user_profile(request):
     user = request.user
     cart = Cart(request)
-    context = {
-        'user': user,
-        'cart': cart
-    }
+    current_orders_lust = user.orders.values_list('items', flat=True)
+    current_orders = OrderItem.objects.filter(order__in=current_orders_lust)
+    context = {'user': user,
+               'cart': cart,
+               'current_orders': current_orders
+               }
     return render(request, 'customer/profile.html', context)
 
 
-@loger_errors
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
-        customer_form = ProfileEditForm(instance=request.user.customer, data=request.POST)
+        customer_form = ProfileEditForm(instance=request.user.customer,
+                                        data=request.POST)
         if user_form.is_valid() and customer_form.is_valid():
             user_form.save()
             customer_form.save()

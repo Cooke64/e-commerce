@@ -7,7 +7,12 @@ Login
 <h3>{{ user.customer.address }}</h3>
 <h3>{{ user.customer.spent_money }}</h3>
 <h3> Размер скидки составляет: {{ user.customer.get_discount }}% </h3>
-
+<h4 style="color:red">
+ {% for item in current_orders %}
+  {{ item }}
+ <hr>
+ {% endfor %}
+</h4>
 
 {% for item in cart %}
 {{ item.name }}

@@ -1,6 +1,8 @@
 import logging
 from functools import wraps
 
+from django.shortcuts import redirect, render
+
 
 def create_logger():
     logging.basicConfig(

@@ -2,12 +2,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
-from core.logger import loger_errors
+
 from .models import Coupon
 from cart.forms import CouponApplyForm
 
 
-@loger_errors
 @require_POST
 def coupon_apply(request):
     form = CouponApplyForm(request.POST)
