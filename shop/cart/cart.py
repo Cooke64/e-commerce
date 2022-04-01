@@ -20,7 +20,7 @@ class Cart(object):
             self.customer = None
         self.cart = cart
 
-    def add(self, product, quantity=1, update_quantity=False):
+    def add(self, product, quantity=1, update_quantity=False,):
         product_slug = str(product.slug)
         if product_slug not in self.cart:
             self.cart[product_slug] = {'quantity': 0,
@@ -29,6 +29,7 @@ class Cart(object):
             self.cart[product_slug]['quantity'] = quantity
         else:
             self.cart[product_slug]['quantity'] += quantity
+
         self.save()
 
     def save(self):

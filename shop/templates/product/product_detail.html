@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
+{% load cache %}
  {% block title %}
 {{ product.name }}
     {% endblock %}
 
 {% block content %}
-
-<h2>ДОбавить оценку</h2>
-<h5>Total like are {{liker.res|floatformat:2}}</h5>
+{% cache 20 content %}
+<h2>{{ product.name }}</h2>
+<div class="review-feedback">
+                <span class="fa fa-star {% if product.get_average_likes > 0 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if product.get_average_likes > 1 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if product.get_average_likes > 2 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if product.get_average_likes > 3 %} checked {% endif %}"></span>
+                <span class="fa fa-star {% if product.get_average_likes > 4 %} checked {% endif %}"></span>
+            </div>
 {% if request.user.is_authenticated%}
-{% if not user_likes %}
-
     <form method="POST" action="{% url 'add_score' product.slug %}">
         {%csrf_token %}
         {{ add_score_form }}
@@ -17,8 +22,6 @@
         <button type="submit" class="btn btn-primary"> оценить </button>
     </form>
 {% endif %}
-{% endif %}
-<h3>{{ product.name }}</h3>
 <h6><a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></h6>
 <p>{{ product.price }}</p>
 {% if request.user.is_authenticated %}
@@ -60,5 +63,5 @@
         <button type="submit" class="btn btn-primary"> Добавить </button>
     </form>
 {% endif %}
-
+{% endcache %}
 {% endblock %}

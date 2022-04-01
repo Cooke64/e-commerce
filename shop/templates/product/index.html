@@ -1,8 +1,11 @@
+
 {% extends 'base.html' %}
+{% load cache %}
 {% block title %}
 {% if category %}{{ category.name }}{% else %} Главная {% endif %}
 {% endblock %}
 {% block content %}
+{% cache 20 content %}
 <script>
     let all_items = document.getElementById('all_items')
     let with_feeds = document.getElementById('with_feeds')
@@ -37,4 +40,5 @@
     <img src="{{ item.image.url }}" alt="">
     {% endif %}
 {% endfor %}
+{% endcache %}
 {% endblock %}

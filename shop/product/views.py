@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 
 from cart.forms import CartAddProductForm
+from core.logger import loger_errors
 from coupons.forms import CouponForm
 from .forms import FeedbackForm, RateForm
 from .models import Product, Category, Feedback, Favorite, Likes
@@ -70,37 +71,25 @@ def product_list(request, cat_slug=None):
     return render(request, 'product/index.html', context)
 
 
-def product_detail(request, product_slug):
-    user_likes =None
+def product_detail(request, product_slug: str):
+    user = request.user
     product = (Product.objects
                .select_related('category')
-               .prefetch_related('likes')
                .get(slug=product_slug)
                )
-
-    liker = product.likes.aggregate(res=Avg('score'))
-
-    if request.user.is_authenticated:
-        user = request.user
-        user_likes = Likes.objects.filter(product=product.pk, user=user)
-
     feedbacks = Feedback.objects.filter(product=product.pk)
     in_fave = Favorite.objects.filter(
-        user=request.user.pk,
+        user=user.pk,
         product=product.pk
     ).exists()
     feedback_form = FeedbackForm(request.POST or None)
-    coupon_apply_form = CouponForm()
     add_score_form = RateForm()
     form = CartAddProductForm()
     context = {
-        'liker': liker,
-        'user_likes': user_likes,
         'product': product,
         'form': form,
         'feedback_form': feedback_form,
         'feedbacks': feedbacks,
-        'coupon_apply_form': coupon_apply_form,
         'in_fave': in_fave,
         'add_score_form': add_score_form
     }
@@ -108,7 +97,7 @@ def product_detail(request, product_slug):
 
 
 @login_required(login_url='login_user')
-def add_feedback(request, product_slug):
+def add_feedback(request, product_slug: str):
     product = get_object_or_404(Product, slug=product_slug)
     form = FeedbackForm(request.POST or None)
     if form.is_valid():
@@ -131,8 +120,9 @@ def favorites_items(request):
                   )
 
 
+
 @login_required
-def add_item_in_fav(request, product_slug):
+def add_item_in_fav(request, product_slug: str):
     fav_item = get_object_or_404(Product, slug=product_slug)
     is_exist = (Favorite.objects
                 .filter(user=request.user, product=fav_item)
@@ -145,8 +135,9 @@ def add_item_in_fav(request, product_slug):
     return redirect('product_detail', product_slug=product_slug)
 
 
+
 @login_required
-def stop_being_fav(request, product_slug):
+def stop_being_fav(request, product_slug: str):
     fav_item = get_object_or_404(Product, slug=product_slug)
     fav_in_bd = Favorite.objects.filter(user=request.user, product=fav_item)
     if fav_in_bd.exists():
@@ -154,7 +145,8 @@ def stop_being_fav(request, product_slug):
     return redirect('product_detail', product_slug=product_slug)
 
 
-def add_score(request, product_slug):
+@login_required
+def add_score(request, product_slug: str):
     product = Product.objects.get(slug=product_slug)
     if request.method == 'POST':
         form = RateForm(request.POST)

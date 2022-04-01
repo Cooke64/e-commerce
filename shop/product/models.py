@@ -1,30 +1,49 @@
 from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Avg
 
 from django.urls import reverse
 
-COLOR_CHOICES = (('желтый', 'желтый'),
-                 ('не желтый', 'не желтый'),
+
+COLOR_CHOICES = (
+    (1, 'Желтый'),
+    (2, 'Красный'),
+    (3, 'Синий'),
+    (4, 'Черный'),
+    (5, 'Золотой'),
                  )
-SIZE_CHOICES = (('l', 'L'),
-                ('XS', 'XS'),
+
+SIZE_CHOICES = (
+    (1, 'XS'),
+    (2, 'S'),
+    (3, 'M'),
+    (4, 'L'),
+    (5, 'XL'),
                 )
+
+RATE_CHOICES = [
+    (1, '1'),
+    (2, '2'),
+    (3, '3'),
+    (4, '4'),
+    (5, '5'),
+]
 
 
 class Product(models.Model):
+    """
+    Модель товары в наличии.
+    """
     name = models.CharField('Название', max_length=250)
     color = models.CharField(
         'Цвет',
         max_length=250,
-        null=True,
         blank=True,
         choices=COLOR_CHOICES
     )
     size = models.CharField(
         'Размер',
         max_length=250,
-        null=True,
         blank=True,
         choices=SIZE_CHOICES
     )
@@ -83,17 +102,17 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
 
-
-RATE_CHOICES = [
-    (1, '1 - Trash'),
-    (2, '2 - Horrible'),
-    (3, '3 - Terrible'),
-    (4, '4 - Bad'),
-    (5, '5 - OK'),
-]
+    def get_average_likes(self):
+        product = Product.objects.get(name=self)
+        avg_likes = product.likes.aggregate(result=Avg('score'))
+        total = 0
+        if avg_likes["result"] is not None:
+            total = float(avg_likes["result"])
+        return total
 
 
 class Likes(models.Model):
+    """Отметки лайков конкретного пользователя."""
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='likes'
     )
@@ -104,6 +123,7 @@ class Likes(models.Model):
 
 
 class Category(models.Model):
+    """Категория товара."""
     name = models.CharField('Название', max_length=250)
     slug = models.SlugField('Ссылка', max_length=250, unique=True)
 
@@ -119,6 +139,7 @@ class Category(models.Model):
 
 
 class Brand(models.Model):
+    """Бренд конкретного товара."""
     name = models.CharField('Название', max_length=250)
     slug = models.SlugField('Ссылка', max_length=250, unique=True)
     description = models.TextField('Описание', blank=True)
@@ -132,6 +153,7 @@ class Brand(models.Model):
 
 
 class Store(models.Model):
+    """Магазины, в которых имеется в наличии товар."""
     name = models.CharField('Название', max_length=30)
     address = models.CharField('Адрес', max_length=30, null=True, blank=True)
     contact = models.IntegerField('Контакты', null=True, blank=True)
@@ -150,12 +172,14 @@ class Store(models.Model):
 
 
 class Feedback(models.Model):
+    """Отзыв покупателя на товар."""
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='feedbacks'
     )
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='feedbacks')
     text = models.TextField()
+    score = models.IntegerField(choices=RATE_CHOICES, default=1)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -168,6 +192,7 @@ class Feedback(models.Model):
 
 
 class Favorite(models.Model):
+    """Избранные товары пользователя."""
     user = models.ForeignKey(
         User,
         related_name='who_likes_items',

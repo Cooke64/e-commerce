@@ -2,12 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
+from core.logger import loger_errors
 from product.models import Product
 from .cart import Cart
 from .forms import CartAddProductForm, CouponApplyForm
 
 
 @login_required(login_url='login_user')
+@loger_errors
 @require_POST
 def cart_add(request, product_slug):
     cart = Cart(request)
@@ -23,6 +25,7 @@ def cart_add(request, product_slug):
     return redirect('cart_detail')
 
 
+@loger_errors
 @login_required(login_url='login_user')
 def cart_remove(request, product_slug):
     cart = Cart(request)

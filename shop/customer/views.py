@@ -7,6 +7,7 @@ from django.contrib.auth import login, logout
 from django.urls import reverse_lazy
 
 from cart.cart import Cart
+from core.logger import loger_errors
 from customer.forms import (
     UserRegisterForm,
     UserEditForm,
@@ -22,11 +23,13 @@ class LoginUser(LoginView):
         return reverse_lazy('index')
 
 
+@loger_errors
 def logout_user(request):
     logout(request)
-    return redirect('index')
+    return redirect('index1')
 
 
+@loger_errors
 def signup(request):
     signup_is_true = True
     form = UserRegisterForm()
@@ -48,6 +51,7 @@ def signup(request):
     return render(request, 'customer/login.html', context)
 
 
+@loger_errors
 @login_required(login_url='login_user')
 def user_profile(request):
     user = request.user
@@ -59,6 +63,7 @@ def user_profile(request):
     return render(request, 'customer/profile.html', context)
 
 
+@loger_errors
 @login_required
 def edit_profile(request):
     if request.method == 'POST':
