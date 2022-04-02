@@ -21,7 +21,7 @@ class Order(models.Model):
                                 choices=delivery_choice)
     created = models.DateTimeField(auto_now_add=True)
     has_paid = models.BooleanField(default=False)
-    will_be_delivered = models.DateTimeField()
+    will_be_delivered = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('-created',)

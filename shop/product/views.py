@@ -13,14 +13,15 @@ class SearchResultsView(ListView):
     template_name = 'product/search_result.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        """Передаем в шаблон параметры get запроса"""
+        """Передаем в шаблон параметры get запроса."""
         context = super().get_context_data(**kwargs)
         context['q'] = self.request.GET.get('q')
         return context
 
     def get_queryset(self):
         """Получаем список товаров, соответствую их запросу по имени или
-        описанию."""
+        описанию.
+        """
         query = self.request.GET.get('q')
         object_list = Product.objects.filter(
             Q(name__icontains=query) |
