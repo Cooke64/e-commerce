@@ -10,7 +10,7 @@ from .forms import CartAddProductForm, CouponApplyForm
 
 @login_required(login_url='login_user')
 @require_POST
-def cart_add(request, product_slug):
+def add_product_in_cart(request, product_slug):
     cart = Cart(request)
     product = get_object_or_404(Product, slug=product_slug)
     form = CartAddProductForm(request.POST)
@@ -25,7 +25,7 @@ def cart_add(request, product_slug):
 
 
 @login_required(login_url='login_user')
-def cart_remove(request, product_slug):
+def remove_product_from_cart(request, product_slug):
     cart = Cart(request)
     product = get_object_or_404(Product, slug=product_slug)
     cart.remove(product)
@@ -33,7 +33,7 @@ def cart_remove(request, product_slug):
 
 
 @login_required(login_url='login_user')
-def cart_detail(request):
+def get_cart_detail(request):
     cart = Cart(request)
     coupon_apply_form = CouponApplyForm()
 

@@ -17,3 +17,4 @@ class RateForm(forms.ModelForm):
         model = Likes
         fields = ['score']
 
+

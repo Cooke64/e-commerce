@@ -37,6 +37,8 @@ INTERNAL_IPS = [
     'localhost',
 ]
 
+AUTH_USER_MODEL = 'customer.User'
+
 MIDDLEWARE = [
     'core.middleware.RequestTimeMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -127,7 +129,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
