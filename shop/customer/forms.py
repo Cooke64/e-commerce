@@ -25,7 +25,7 @@ class CodeForm(forms.Form):
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ('email', 'username')
 
 
 class ProfileEditForm(forms.ModelForm):

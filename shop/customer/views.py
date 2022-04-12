@@ -108,14 +108,14 @@ def edit_profile(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
         customer_form = ProfileEditForm(
-            instance=request.user.customer, data=request.POST)
+            instance=request.user, data=request.POST)
         if user_form.is_valid() and customer_form.is_valid():
             user_form.save()
             customer_form.save()
             return redirect('user_profile')
     else:
         user_form = UserEditForm(instance=request.user)
-        customer_form = ProfileEditForm(instance=request.user.customer)
+        customer_form = ProfileEditForm(instance=request.user)
         return render(request, 'customer/edit_profile.html',
                       {'user_form': user_form, 'profile_form': customer_form})
 

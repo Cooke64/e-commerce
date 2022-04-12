@@ -1,14 +1,16 @@
 from rest_framework import routers
 from django.urls import path, include
 
-from .views import ProductViewSet, CategoryViewSet, StoreViewSet, FeedbackViewSet
+from .views import ProductViewSet, CategoryViewSet, StoreViewSet, \
+    FeedbackViewSet, FavoriteViewSet
 
 router = routers.DefaultRouter()
-router.register(r'products', ProductViewSet, basename='all_product')
-router.register(r'categories', CategoryViewSet, basename='all_categories')
-router.register(r'stores', StoreViewSet, basename='all_stores')
-router.register(r'feedbacks', FeedbackViewSet, basename='all_feedbacks')
+router.register(r'products', ProductViewSet,)
+router.register(r'categories', CategoryViewSet,)
+router.register(r'stores', StoreViewSet,)
+router.register(r'feedback/', FeedbackViewSet, basename='feedbacks')
+router.register(r"favorite", FavoriteViewSet, basename="favorite")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('v1/', include(router.urls)),
 ]

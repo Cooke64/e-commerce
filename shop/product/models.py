@@ -6,11 +6,11 @@ from django.urls import reverse
 
 
 COLOR_CHOICES = (
-    (1, 'Желтый'),
-    (2, 'Красный'),
-    (3, 'Синий'),
-    (4, 'Черный'),
-    (5, 'Золотой'),
+    ('Желтый', 'Желтый'),
+    ('Красный', 'Красный'),
+    ('Синий', 'Синий'),
+    ('Черный', 'Черный'),
+    ('Золотой', 'Золотой'),
                  )
 
 SIZE_CHOICES = (
@@ -36,30 +36,20 @@ class Product(models.Model):
     """
     name = models.CharField('Название', max_length=250)
     color = models.CharField(
-        'Цвет',
-        max_length=250,
-        blank=True,
-        choices=COLOR_CHOICES
+        'Цвет', max_length=250, blank=True, choices=COLOR_CHOICES
     )
     size = models.CharField(
-        'Размер',
-        max_length=250,
-        blank=True,
-        choices=SIZE_CHOICES
+        'Размер', max_length=250, blank=True, choices=SIZE_CHOICES
     )
     price = models.DecimalField(
-        'Цена',
-        max_digits=10,
-        decimal_places=2
+        'Цена', max_digits=10, decimal_places=2
     )
     year = models.CharField(
         'Год выпуска', max_length=250, blank=True, null=True)
     slug = models.SlugField(
         'Ссылка', max_length=100, unique=True)
     description = models.TextField(
-        'Описание',
-        null=True,
-        blank=True,
+        'Описание', null=True, blank=True,
     )
     create_date = models.DateTimeField(
         'Дата', auto_now_add=True)
@@ -67,29 +57,20 @@ class Product(models.Model):
         'Цвет', upload_to='products_img/', blank=True, null=True)
     brand = models.ForeignKey(
         'Brand',
-        on_delete=models.CASCADE,
-        related_name='products',
-        verbose_name='Брэнд',
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE, related_name='products',
+        verbose_name='Брэнд', null=True, blank=True,
     )
     category = models.ForeignKey(
         'Category',
-        on_delete=models.CASCADE,
-        related_name='products',
-        verbose_name='Категория',
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE, related_name='products',
+        verbose_name='Категория', null=True, blank=True,
     )
     available = models.BooleanField(default=True)
     shop = models.ManyToManyField(
-        'Store',
-        related_name='product_item',
-        verbose_name='Магазины',
-        null=True,
-        blank=True,
+        'Store', related_name='product_item',
+        verbose_name='Магазины', null=True, blank=True,
     )
-    like = models.ManyToManyField('Likes', related_name="products")
+    like = models.ManyToManyField('Likes', related_name="products", blank=True, null=True)
 
     class Meta:
         ordering = ['name']
