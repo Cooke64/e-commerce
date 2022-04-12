@@ -1,8 +1,9 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
-from rest_framework.response import Response
+
 
 from product.models import Product, Category, Store, Feedback
 from .serializers import ProductSerializer, CategorySerializer, \
@@ -12,6 +13,11 @@ from .serializers import ProductSerializer, CategorySerializer, \
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    pagination_class = LimitOffsetPagination
+    filterset_fields = ('color', 'size', 'price')
+    search_fields = ('@name', '@shop__name', '@brand__name')
+    ordering_fields = ('price', )
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -34,6 +40,12 @@ class StoreViewSet(viewsets.ModelViewSet):
 class FeedbackViewSet(viewsets.ModelViewSet):
     serializer_class = FeedbackSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
-    queryset = Feedback.objects.all()
 
+    def get_queryset(self):
+        post = get_object_or_404(Product, pk=self.kwargs.get('product_id'))
+        return post.feedbacks.all()
 
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user, product_id=self.kwargs.get("product_id")
+        )

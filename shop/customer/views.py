@@ -54,6 +54,8 @@ def signup(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username
+            if user.is_admin and user.is_staff:
+                user.is_active = True
             user.is_active = False
             user.code = code
             user.save()
