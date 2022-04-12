@@ -1,5 +1,5 @@
+from django.db.models import Avg
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from customer.models import User
 from product import models
@@ -7,6 +7,7 @@ from product.models import Feedback, Store, Likes, Product, Favorite
 
 
 class StoreSerializer(serializers.ModelSerializer):
+    """Отображение магазина."""
     product_item = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -19,6 +20,7 @@ class StoreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Отображение категории"""
     products = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -31,6 +33,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+    """Отображение отзывов и рейтинга к товару."""
     user = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
@@ -39,11 +42,11 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feedback
-        fields = ['user', 'product', 'text', 'score']
+        fields = ['user', 'text', 'score']
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-
+    """Вывод полей при отображении всех товаров."""
     class Meta:
         model = models.Product
         fields = ('name', 'price', 'available', 'url')
@@ -64,6 +67,7 @@ class StoreProductSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """Вывод всех полей товара при product_detail."""
     color = serializers.ChoiceField(choices=models.COLOR_CHOICES)
     size = serializers.ChoiceField(choices=models.SIZE_CHOICES)
     category = serializers.SlugRelatedField(slug_field='name', read_only=True)
@@ -72,13 +76,13 @@ class ProductSerializer(serializers.ModelSerializer):
     feedbacks = FeedbackProductSerializer(read_only=True, many=True)
     total_feedback = serializers.SerializerMethodField()
     total_shops = serializers.SerializerMethodField()
-    total_likes = serializers.SerializerMethodField()
+    avg_likes = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Product
         fields = ['name', 'brand', 'price', 'category', 'available',
                   'color', 'size', 'shop', 'feedbacks', 'total_feedback', 'total_shops',
-                  'total_likes', 'url'
+                  'avg_likes', 'url'
                   ]
 
     def get_total_feedback(self, obj):
@@ -87,11 +91,13 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_total_shops(self, obj):
         return Store.objects.filter(product_item=obj.pk).count()
 
-    def get_total_likes(self, obj):
-        return Likes.objects.filter(products=obj.pk).count()
+    def get_avg_likes(self, obj):
+        product = Product.objects.get(pk=obj.pk)
+        return product.likes.aggregate(result=Avg('score'))
 
 
 class FaveSerializer(serializers.ModelSerializer):
+    """Вывод избранных товаров пользователя."""
     product = serializers.SlugRelatedField(
         slug_field="name",
         queryset=Product.objects.all(),
