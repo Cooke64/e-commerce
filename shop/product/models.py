@@ -175,16 +175,10 @@ class Feedback(models.Model):
 class Favorite(models.Model):
     """Избранные товары пользователя."""
     user = models.ForeignKey(
-        User,
-        related_name='who_likes_items',
-        on_delete=models.CASCADE,
-        verbose_name='Покупатель',
+        User, related_name='who_likes_items', on_delete=models.CASCADE, verbose_name='Покупатель',
     )
     product = models.ForeignKey(
-        Product,
-        related_name='favourites',
-        on_delete=models.CASCADE,
-        verbose_name='Избранный товар',
+        Product, related_name='favourites', on_delete=models.CASCADE, verbose_name='Избранный товар',
     )
 
     class Meta:

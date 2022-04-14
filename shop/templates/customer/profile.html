@@ -11,7 +11,12 @@ Login
 В корзине '{{ item.product }}' общей стоимостью '{{ item.total_price }} тугриков' в количестве {{ item.quantity }} штук
 {% endfor %}
 </h4>
-
+<h5>
+ {% for item in order %}
+ {{ item.will_be_delivered }}
+ <hr>
+ {% endfor %}
+</h5>
 <a href="{% url 'cart_detail' %}">К корзине</a>
 <a href="{% url 'favorites_items' %}">Избранное</a>
 <a href="{% url 'edit_profile' %}">Изменить профиль</a>

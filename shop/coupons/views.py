@@ -1,8 +1,11 @@
+import datetime
+from datetime import timedelta, date
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
-
+from customer.services import generate_code
 from .models import Coupon
 from cart.forms import CouponApplyForm
 
@@ -18,3 +21,12 @@ def coupon_apply(request):
         except ObjectDoesNotExist:
             request.session['coupon_id'] = None
     return redirect('cart_detail')
+
+
+def generate_promocode():
+    """Создает промокод для скидки."""
+    code = generate_code()
+    Coupon.objects.create(
+        code=code,
+    )
+    return code

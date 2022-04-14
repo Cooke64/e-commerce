@@ -12,7 +12,7 @@ from customer.forms import (
 )
 from customer.models import Customer, User
 from customer.services import send_confirm_messages, generate_code
-from orders.models import OrderItem
+from orders.models import OrderItem, Order
 
 
 def login_user(request):
@@ -95,8 +95,10 @@ def enter_code_to_confirm(request):
 def user_profile(request):
     user = request.user
     cart = Cart(request)
+    order = Order.objects.filter(customer=user)
     context = {'user': user,
                'cart': cart,
+               'order': order,
                }
     return render(request, 'customer/profile.html', context)
 
@@ -106,7 +108,7 @@ def edit_profile(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
         customer_form = ProfileEditForm(
-            instance=request.user, data=request.POST)
+            instance=request.user.ustomer, data=request.POST)
         if user_form.is_valid() and customer_form.is_valid():
             user_form.save()
             customer_form.save()

@@ -7,9 +7,9 @@ from product.models import Product
 
 User = get_user_model()
 
-delivery_choice = (('Post', 'Post'),
-                   ('No post', 'No post'),
-                   )
+DELIVERY_CHOICES = (('Post', 'Post'),
+                    ('No post', 'No post'),
+                    )
 
 
 class Order(models.Model):
@@ -17,8 +17,9 @@ class Order(models.Model):
         User, on_delete=models.CASCADE, null=True, related_name='orders')
     address = models.CharField(max_length=150)
     comment = models.CharField(max_length=30)
-    delivery = models.CharField(max_length=250, blank=True, null=True,
-                                choices=delivery_choice)
+    delivery = models.CharField(
+        max_length=250, blank=True, null=True, choices=DELIVERY_CHOICES
+    )
     created = models.DateTimeField(auto_now_add=True)
     has_paid = models.BooleanField(default=False)
     will_be_delivered = models.DateTimeField(auto_now_add=True)
@@ -35,17 +36,15 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items',
-                              on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, related_name='order_items',
-                                on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product, related_name='order_items', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
 
     def get_cost(self):
-        return (self.price * self.quantity)
+        return self.price * self.quantity
 
     def __str__(self):
         return self.product.name
-
-

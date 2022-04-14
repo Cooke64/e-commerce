@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
 
+
+
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
         if not email:
@@ -40,16 +42,12 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(
-        verbose_name='email address',
-        max_length=255,
-        unique=True,
+        'Email', max_length=255, unique=True,
     )
     is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(
-        'Когда зарегистрировался', auto_now_add=True
-    )
+    timestamp = models.DateTimeField('Когда зарегистрировался', auto_now_add=True)
     # Код для подтверждения профиля через отправку сообщения на емейл
     code = models.CharField('Код подтверждения', max_length=50, blank=True, null=True, default=None)
 
@@ -80,22 +78,17 @@ class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30, blank=True, null=True)
     second_name = models.CharField(max_length=30, blank=True, null=True)
-    phone = models.CharField(
-        max_length=30, null=True, blank=True,)
-    address = models.TextField(
-        'Адрес', null=True, blank=True,
-    )
-    delivery_info = models.TextField(
-        'Доставка', null=True, blank=True,
-    )
-    spent_money = models.IntegerField(
-        'Потрачено денег', default=0
-    )
+    phone = models.CharField(max_length=30, null=True, blank=True,)
+    address = models.TextField('Адрес', null=True, blank=True,)
+    delivery_info = models.TextField('Доставка', null=True, blank=True,)
+    spent_money = models.IntegerField('Потрачено денег', default=0)
+    last_buy = models.DateField('Последний раз купил', null=True, blank=True)
 
     def __str__(self):
         return self.first_name
 
     def get_discount(self):
+        """Определяет размер скидки в зависимости от потраченных денег покупателем"""
         if self.spent_money < 10:
             discount = 5
         elif self.spent_money < 20:
@@ -103,3 +96,15 @@ class Customer(models.Model):
         else:
             discount = 15
         return discount
+
+    def save(self, *args, **kwargs):
+        """Определяет дату последней покупки и присваивает
+        дату последнего заказа текущего покупателя."""
+        from orders.models import Order
+
+        last_buy_was = Order.objects.filter(user=self.user).last()
+        if last_buy_was:
+            self.last_buy = last_buy_was.created
+        else:
+            self.last_buy = None
+        super().save(*args, **kwargs)
