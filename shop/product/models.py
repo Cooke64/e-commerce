@@ -71,6 +71,7 @@ class Product(models.Model):
         verbose_name='Магазины', null=True, blank=True,
     )
     like = models.ManyToManyField('Likes', related_name="products", blank=True, null=True)
+    view_count = models.IntegerField("Количество просмотров товара", default=0)
 
     class Meta:
         ordering = ['name']

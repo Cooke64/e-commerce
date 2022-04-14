@@ -5,6 +5,7 @@ from django.core.mail import EmailMessage
 
 from coupons.views import generate_promocode
 from mailing.models import Mailing
+from shop.celery import app
 
 
 def sender_messages(request):
@@ -23,8 +24,8 @@ def sender_messages(request):
     return email.send()
 
 
-@current_task
-def order_created(request):
+@app.task
+def send_mail_to_user_without_payment(request):
     """
     Задача для отправки сообщений, если пользователь давно не производил покупки.
     """

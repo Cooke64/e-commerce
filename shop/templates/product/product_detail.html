@@ -21,6 +21,7 @@
     </form>
 {% endif %}
 <h6><a href="{{ product.category.get_absolute_url }}">{{ product.category }}</a></h6>
+<p>Viewed {{ product.view_count }} times</p>
 <p>{{ product.price }}</p>
 {% if request.user.is_authenticated %}
     <form action="{% url 'item_add' product.slug %}" method="POST">

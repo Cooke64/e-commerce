@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Avg
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 
@@ -79,6 +81,9 @@ def product_detail(request, product_slug: str):
                .select_related('category',)
                .get(slug=product_slug)
                )
+    # Увеличиваем количество просмотров товара при каждом обращении
+    product.view_count += 1
+    product.save()
     feedbacks = Feedback.objects.filter(product=product.pk)
     # Если продукт находится в избранных, то показываем
     # кнопку добавить в избранное
