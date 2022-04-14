@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from coupons.models import Coupon
 from product.models import Product
 
 User = get_user_model()
@@ -23,6 +24,10 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     has_paid = models.BooleanField(default=False)
     will_be_delivered = models.DateTimeField(auto_now_add=True)
+    coupon = models.ForeignKey(
+        Coupon, related_name='orders', on_delete=models.SET_NULL,  null=True, blank=True
+    )
+    discount = models.IntegerField(default=0)
 
     class Meta:
         ordering = ('-created',)

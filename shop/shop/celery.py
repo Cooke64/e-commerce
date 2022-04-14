@@ -17,4 +17,8 @@ app.conf.beat_schedule = {
         'task': 'mailing.tasks.send_mail_to_user_without_payment',
         'schedule': crontab(day_of_week='monday'),
     },
+    'add-every-monday': {
+        'task': 'mailing.tasks.send_mail_to_everyone',
+        'schedule': crontab(day_of_week='monday'),
+    },
 }
