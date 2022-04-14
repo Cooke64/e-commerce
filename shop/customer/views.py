@@ -62,8 +62,8 @@ def signup(request):
             Customer.objects.create(user=user)
             send_confirm_messages(username=user.username, email=user.email, code=code)
             return redirect('confirm')
-    else:
-        messages.error(request, 'Something went wrong')
+        else:
+            messages.error(request, 'Something went wrong')
     context = {
         'signup_is_true': signup_is_true,
         'form': form
@@ -84,6 +84,7 @@ def enter_code_to_confirm(request):
                 user.is_active = True
                 user.save()
                 login(request, user)
+                return redirect('index')
             except ObjectDoesNotExist as error:
                 raise error
     form = CodeForm()
@@ -94,11 +95,8 @@ def enter_code_to_confirm(request):
 def user_profile(request):
     user = request.user
     cart = Cart(request)
-    current_orders_lust = user.orders.values_list('items', flat=True)
-    current_orders = OrderItem.objects.filter(order__in=current_orders_lust)
     context = {'user': user,
                'cart': cart,
-               'current_orders': current_orders
                }
     return render(request, 'customer/profile.html', context)
 

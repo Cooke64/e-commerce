@@ -21,6 +21,7 @@
 hello {{ request.user.username }}
 <a href="{% url 'logout_user' %}">Выйти</a>
 <a href="{% url 'user_profile' %}">Профиль</a>
+
 {% else %}
 <a href="{% url 'login_user' %}">Войти</a>
 <a href="{% url 'signup' %}">Регистрация</a>

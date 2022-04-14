@@ -1,8 +1,6 @@
 from decimal import Decimal
 from django.conf import settings
-from django.db.models import F
 
-from customer.models import Customer
 from product.models import Product
 from coupons.models import Coupon
 
@@ -15,7 +13,7 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.coupon_id = self.session.get('coupon_id')
         if request.user.is_authenticated:
-            self.customer = request.user
+            self.customer = request.user.customer
         else:
             self.customer = None
         self.cart = cart

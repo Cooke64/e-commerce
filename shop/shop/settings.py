@@ -1,10 +1,16 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-8cq15i)nu_u8+xgluiq)!6v8oyk7-gf!_d@@fpncy2p^yiq789'
+SECRET_KEY = os.getenv('SECRET_KEY')
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_VK_OAUTH2_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_VK_OAUTH2_SECRET')
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
 
 DEBUG = True
 
@@ -22,6 +28,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'django_filters',
+    'social_django',
 
     'product',
     'cart',
@@ -65,6 +72,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
+
                 'cart.context_processors.cart',
 
             ],
@@ -73,7 +84,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'shop.wsgi.application'
-
 
 # DATABASES = {
 #     'default': {
@@ -92,7 +102,6 @@ DATABASES = {
     }
 }
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -107,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 LANGUAGE_CODE = 'ru'
 
@@ -142,7 +150,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 EMAIL_HOST = 'smtp.yandex.ru'
@@ -154,6 +161,7 @@ EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+LOGIN_REDIRECT_URL = 'index'
 
 CACHES = {
     'default': {
@@ -161,3 +169,19 @@ CACHES = {
         'LOCATION': os.path.join(BASE_DIR, 'shop_cache'),
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.vk.VKOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+SOCIAL_AUTH_PIPELINE = [
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+]

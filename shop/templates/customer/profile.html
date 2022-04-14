@@ -5,19 +5,13 @@ Login
 {% block content %}
 <h1> {{ user.username }} </h1>
 <h3>{{ user.customer.address }}</h3>
-<h3>{{ user.customer.spent_money }}</h3>
-<h3> Размер скидки составляет: {{ user.customer.get_discount }}% </h3>
+<h3> Скидка с учетом бонуса лояльности {{ user.customer.get_discount }}% </h3>
 <h4 style="color:red">
- {% for item in current_orders %}
-  {{ item }}
- <hr>
- {% endfor %}
+{% for item in cart %}
+В корзине '{{ item.product }}' общей стоимостью '{{ item.total_price }} тугриков' в количестве {{ item.quantity }} штук
+{% endfor %}
 </h4>
 
-{% for item in cart %}
-{{ item.name }}
-{{ item.total_price }}
-{% endfor %}
 <a href="{% url 'cart_detail' %}">К корзине</a>
 <a href="{% url 'favorites_items' %}">Избранное</a>
 <a href="{% url 'edit_profile' %}">Изменить профиль</a>

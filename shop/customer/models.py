@@ -53,7 +53,6 @@ class User(AbstractBaseUser):
     # Код для подтверждения профиля через отправку сообщения на емейл
     code = models.CharField('Код подтверждения', max_length=50, blank=True, null=True, default=None)
 
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     objects = UserManager()
@@ -92,7 +91,6 @@ class Customer(models.Model):
     spent_money = models.IntegerField(
         'Потрачено денег', default=0
     )
-
 
     def __str__(self):
         return self.first_name
