@@ -2,7 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
-
+from coupons.models import Coupon
 
 
 class UserManager(BaseUserManager):
@@ -83,6 +83,7 @@ class Customer(models.Model):
     delivery_info = models.TextField('Доставка', null=True, blank=True,)
     spent_money = models.IntegerField('Потрачено денег', default=0)
     last_buy = models.DateField('Последний раз купил', null=True, blank=True)
+    promocode = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True,)
 
     def __str__(self):
         return self.first_name

@@ -6,12 +6,14 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 
 from cart.cart import Cart
+from coupons.models import Coupon
 from customer.forms import (
     UserRegisterForm, UserEditForm,
     ProfileEditForm, CodeForm,
 )
 from customer.models import Customer, User
-from customer.services import send_confirm_messages, generate_code
+from customer.services import send_confirm_messages, generate_code, \
+    send_welcome_email
 from orders.models import OrderItem, Order
 
 
@@ -82,7 +84,11 @@ def enter_code_to_confirm(request):
             try:
                 user = User.objects.get(code=sent_code_via_email)
                 user.is_active = True
+                user.code = generate_code()
                 user.save()
+                # При успешном подтверждении отправляется персональный промокод.
+                promocode = Coupon.objects.all.last()
+                send_welcome_email(user.email, promocode)
                 login(request, user)
                 return redirect('index')
             except ObjectDoesNotExist as error:

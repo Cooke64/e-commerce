@@ -1,8 +1,7 @@
 import string
 import random
 
-from django.conf import settings
-from django.core.mail import EmailMessage
+from core.services import send_email
 
 
 def generate_code():
@@ -22,8 +21,13 @@ def send_confirm_messages(username, email, code):
                f'для подтверждения вашей учетной записи перейдите по ссылке'
                f'some kind of link/'
                f'укажите этот код {code}')
-    email = EmailMessage(
-        body=message,
-        from_email=settings.EMAIL_HOST_USER,
-        to=[f'{email}'])
+    email = send_email(email, message)
+    return email.send()
+
+
+def send_welcome_email(email, promocode):
+    """Отправляет сообщение на емейл для подтверждения учетной записи."""
+    message = (f'Поздравляем с успешной регистрацией. Дарим вам этот промокод со скидкой 5%'
+               f'{promocode}')
+    email = send_email(email, message)
     return email.send()

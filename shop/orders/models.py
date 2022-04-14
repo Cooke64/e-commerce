@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -33,7 +34,8 @@ class Order(models.Model):
         ordering = ('-created',)
 
     def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
+        total_cost = sum(item.get_cost() for item in self.items.all())
+        return total_cost - total_cost * (self.discount / Decimal('100'))
 
     def save(self, *args, **kwargs):
         self.will_be_delivered = datetime.now() + timedelta(3)
