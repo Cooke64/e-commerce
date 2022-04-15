@@ -27,7 +27,7 @@ def send_mail_to_user_without_payment(request):
     message = f'Что-то давно не покупали у нас. Вот вам подарочный код {CODE}'
     users = Customer.objects.select_related('user').filter(last_buy=0)
     for user in users:
-        return sender_messages.dalay(request, user.email, message)
+        return sender_messages(request, user.email, message)
 
 
 @app.task
@@ -38,7 +38,7 @@ def send_mail_to_everyone(request):
     message = f'У нас новые товары. Загляни:)'
     users = User.objects.all().valuse('email')
     for user in users:
-        return sender_messages.delay(request, user.email, message)
+        return sender_messages(request, user.email, message)
 
 
 @app.task
@@ -46,8 +46,8 @@ def send_welcome_email(email, promocode):
     """Отправляет сообщение на емейл для подтверждения учетной записи."""
     message = (f'Поздравляем с успешной регистрацией. Дарим вам этот промокод со скидкой 5%'
                f'{promocode}')
-    email = send_email(email, message)
-    return email.delay()
+    return send_email(email, message)
+
 
 
 @app.task
@@ -57,5 +57,5 @@ def send_confirm_messages(username, email, code):
                f'для подтверждения вашей учетной записи перейдите по ссылке'
                f'some kind of link/'
                f'укажите этот код {code}')
-    email = send_email(email, message)
-    return email.delay()
+    return send_email(email, message)
+

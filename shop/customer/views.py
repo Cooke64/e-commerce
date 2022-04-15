@@ -61,7 +61,8 @@ def signup(request):
             user.code = code
             user.save()
             Customer.objects.create(user=user)
-            send_confirm_messages(username=user.username, email=user.email, code=code)
+            # Task to celery mailing
+            send_confirm_messages.delay(username=user.username, email=user.email, code=code)
             return redirect('confirm')
         else:
             messages.error(request, 'Something went wrong')
@@ -84,7 +85,8 @@ def enter_code_to_confirm(request):
                 user = User.objects.get(code=sent_code_via_email)
                 user.is_active = True
                 user.save()
-                send_welcome_email(email=user.email, promocode=123)
+                # Task to celery mailing
+                send_welcome_email.delay(email=user.email, promocode=123)
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 return redirect('index')
             except ObjectDoesNotExist as error:
