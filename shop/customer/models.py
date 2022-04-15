@@ -103,7 +103,7 @@ class Customer(models.Model):
         дату последнего заказа текущего покупателя."""
         from orders.models import Order
 
-        last_buy_was = Order.objects.filter(user=self.user).last()
+        last_buy_was = Order.objects.filter(customer_id=self.user).last()
         if last_buy_was:
             self.last_buy = last_buy_was.created
         else:

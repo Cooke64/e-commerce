@@ -8,4 +8,4 @@ def send_email(email, message):
         body=message,
         from_email=settings.EMAIL_HOST_USER,
         to=[f'{email}'])
-    return email
+    return email.send()

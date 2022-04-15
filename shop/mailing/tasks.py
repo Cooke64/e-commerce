@@ -1,6 +1,6 @@
 from core.services import send_email
 from coupons.views import generate_promocode
-from customer.models import User
+from customer.models import User, Customer
 from mailing.models import Mailing
 from shop.celery import app
 
@@ -8,7 +8,8 @@ CODE = generate_promocode()
 
 
 def sender_messages(request, email, message):
-    """Отправляет сообщение на емейл при завершении заказа."""
+    """Создает объъект email от базовой функции отправки сообщения.
+     Далее создается объект в модель отправленной рассылки."""
     email = send_email(email, message)
     Mailing.objects.create(
         user=request.user,
@@ -24,9 +25,9 @@ def send_mail_to_user_without_payment(request):
     Задача для отправки сообщений, если пользователь давно не производил покупки.
     """
     message = f'Что-то давно не покупали у нас. Вот вам подарочный код {CODE}'
-    user = request.user.username
-    if user.last_buy is None:
-        return sender_messages(request, user.email, message)
+    users = Customer.objects.select_related('user').filter(last_buy=0)
+    for user in users:
+        return sender_messages.dalay(request, user.email, message)
 
 
 @app.task
@@ -37,4 +38,24 @@ def send_mail_to_everyone(request):
     message = f'У нас новые товары. Загляни:)'
     users = User.objects.all().valuse('email')
     for user in users:
-        return sender_messages(request, user.email, message)
+        return sender_messages.delay(request, user.email, message)
+
+
+@app.task
+def send_welcome_email(email, promocode):
+    """Отправляет сообщение на емейл для подтверждения учетной записи."""
+    message = (f'Поздравляем с успешной регистрацией. Дарим вам этот промокод со скидкой 5%'
+               f'{promocode}')
+    email = send_email(email, message)
+    return email.delay()
+
+
+@app.task
+def send_confirm_messages(username, email, code):
+    """Отправляет сообщение на емейл для подтверждения учетной записи."""
+    message = (f'Уважаемый {username},'
+               f'для подтверждения вашей учетной записи перейдите по ссылке'
+               f'some kind of link/'
+               f'укажите этот код {code}')
+    email = send_email(email, message)
+    return email.delay()
