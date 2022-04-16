@@ -139,8 +139,9 @@ class Store(models.Model):
     name = models.CharField('Название', max_length=30)
     address = models.CharField('Адрес', max_length=30, null=True, blank=True)
     contact = models.IntegerField('Контакты', null=True, blank=True)
-    picture = models.ImageField('Изображение', upload_to='products_img/',
-                                null=True, blank=True)
+    picture = models.ImageField(
+        'Изображение', upload_to='products_img/', null=True, blank=True
+    )
 
     class Meta:
         verbose_name = 'Магазин'

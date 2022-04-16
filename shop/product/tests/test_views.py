@@ -10,22 +10,22 @@ class ViewsTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.user = User.objects.create_user(
+            username='MikeyMouse', email='test@mail.com')
         cls.category = Category.objects.create(
-            name='Тестовый заголовок',
-            slug='test-slug',
+            name='Тестовая группа',
+            slug='test_slug',
         )
         cls.product = Product.objects.create(
-            name='Тестовый продукт',
-            slug='test_slug',
-            price=123.00,
-            category=cls.category
+            name='Тестовый товар',
+            price=12,
+            slug='test_slug'
         )
 
     def setUp(self):
-        self.user = User.objects.create_user(username='Тестер')
         self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
+        self.customer_client = Client()
+        self.customer_client.force_login(self.user)
 
     def test_pages_uses_correct_template(self):
         templates_pages_names = {

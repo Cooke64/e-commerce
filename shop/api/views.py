@@ -2,15 +2,17 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework.response import Response
-from rest_framework import viewsets, filters, permissions
+from rest_framework import viewsets, filters, permissions, serializers
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.viewsets import GenericViewSet
 
+from customer.models import User, Customer
 from product.models import Product, Category, Store, Feedback
 from .serializers import ProductSerializer, CategorySerializer, \
-    StoreSerializer, FeedbackSerializer, ProductListSerializer, FaveSerializer
+    StoreSerializer, FeedbackSerializer, ProductListSerializer, FaveSerializer, \
+    CustomerSerializerFull, CustomerSerializerBasic
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -73,6 +75,12 @@ class FeedbackViewSet(viewsets.ModelViewSet):
             user=self.request.user, product_id=self.kwargs.get("product_id")
         )
 
+    def validate(self, data):
+        if data['text'] is None:
+            raise serializers.ValidationError(
+                'Добавьте текст отзыва')
+        return data
+
 
 class FavoriteViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
     serializer_class = FaveSerializer
@@ -84,3 +92,13 @@ class FavoriteViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    permissions_classes = (permissions.IsAdminUser,)
+
+    def get_serializer_class(self):
+        if self.request.user.is_admin:
+            return CustomerSerializerFull
+        return CustomerSerializerBasic

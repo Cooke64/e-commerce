@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from customer.models import User
+from customer.models import User, Customer
 from product import models
 from product.models import Feedback, Store, Likes, Product, Favorite
 
@@ -111,3 +111,32 @@ class FaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
         fields = '__all__'
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'admin', 'staff', 'is_active']
+
+
+class CustomerSerializerFull(serializers.HyperlinkedModelSerializer):
+    user = serializers.SlugRelatedField(
+        UserSerializer, read_only=True, many=True
+    )
+
+    class Meta:
+        model = Customer
+        fields = ['user', 'first_name', 'phone', 'spent_money', 'last_buy']
+
+
+class CustomerSerializerBasic(serializers.HyperlinkedModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field="username",
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault(),
+    )
+
+    class Meta:
+        model = Customer
+        fields = ['user', 'first_name', 'phone']
+        read_only_fields = ('user',)
