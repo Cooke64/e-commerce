@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% load cache %}
 {% block title %}
@@ -6,17 +5,6 @@
 {% endblock %}
 {% block content %}
 {% cache 20 content %}
-<script>
-    let all_items = document.getElementById('all_items')
-    let with_feeds = document.getElementById('with_feeds')
-    let max_price = document.getElementById('max_price')
-    let min_price = document.getElementById('min_price')
-
-    all_items.addEventListener('submit', function(){
-        alert("Вы нажали на кнопку");
-        }
-    )
-</script>
 <form action="/" method="GET">
     {% csrf_token %}
 <button class="btn btn-outline-secondary" id='all_items' name='all_items' type="submit">Все товары</button>

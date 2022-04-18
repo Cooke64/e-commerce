@@ -1,8 +1,8 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect, get_object_or_404
 
 from cart.cart import Cart
@@ -11,9 +11,9 @@ from customer.forms import (
     ProfileEditForm, CodeForm,
 )
 from customer.models import Customer, User
-from customer.services import generate_code
+from customer.services import generate_code, get_cleaned_data
 from mailing.tasks import send_confirm_messages, send_welcome_email
-from orders.models import OrderItem, Order
+from orders.models import Order
 
 
 def login_user(request):
@@ -22,17 +22,7 @@ def login_user(request):
         return redirect('index')
     form = AuthenticationForm(request, data=request.POST)
     if form.is_valid():
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is None:
-            return redirect('login_user')
-        try:
-            login(request, user)
-            return redirect('index')
-        except ValidationError as e:
-            raise e
-
+        get_cleaned_data(request, form)
     return render(request, 'customer/login.html', {'form': form})
 
 
