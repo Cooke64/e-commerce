@@ -2,8 +2,11 @@ import string
 import random
 
 from django.contrib.auth import authenticate, login
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.shortcuts import redirect
+
+from customer.models import User
+from mailing.tasks import send_welcome_email
 
 
 def generate_code():
@@ -26,3 +29,19 @@ def make_login_user(request, form):
         return redirect('index')
     except ValidationError as e:
         raise e
+
+
+def activate_user(request, form):
+    """Находим пользователя по коду, подтверждаем этого пользователя, отправляем мейл с промокодом."""
+    sent_code_via_email = form.cleaned_data.get("code")
+    try:
+        user = User.objects.get(code=sent_code_via_email)
+        user.is_active = True
+        user.save()
+        # Task to celery mailing
+        send_welcome_email(email=user.email, promocode=123)
+        login(request, user,
+              backend='django.contrib.auth.backends.ModelBackend')
+        return redirect('index')
+    except ObjectDoesNotExist as error:
+        raise error

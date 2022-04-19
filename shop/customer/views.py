@@ -11,7 +11,7 @@ from customer.forms import (
     ProfileEditForm, CodeForm,
 )
 from customer.models import Customer, User
-from customer.services import generate_code, make_login_user
+from customer.services import generate_code, make_login_user, activate_user
 from mailing.tasks import send_confirm_messages, send_welcome_email
 from orders.models import Order
 
@@ -38,6 +38,7 @@ def signup(request):
     if request.user.is_authenticated and request.user.is_active:
         return redirect('index')
     form = UserRegisterForm()
+    # Создаем код для подтверждения по емейлу
     code = generate_code()
     if request.method == 'POST':
         form = UserRegisterForm(request.POST or None)
@@ -51,15 +52,11 @@ def signup(request):
             user.save()
             Customer.objects.create(user=user)
             # Task to celery mailing
-            send_confirm_messages(username=user.username, email=user.email,
-                                  code=code)
+            send_confirm_messages(username=user.username, email=user.email, code=code)
             return redirect('confirm')
         else:
             messages.error(request, 'Something went wrong')
-    context = {
-        'signup_is_true': True,
-        'form': form
-    }
+    context = {'signup_is_true': True, 'form': form}
     return render(request, 'customer/login.html', context)
 
 
@@ -70,18 +67,7 @@ def enter_code_to_confirm(request):
     if request.method == 'POST':
         form = CodeForm(request.POST)
         if form.is_valid():
-            sent_code_via_email = form.cleaned_data.get("code")
-            try:
-                user = User.objects.get(code=sent_code_via_email)
-                user.is_active = True
-                user.save()
-                # Task to celery mailing
-                send_welcome_email(email=user.email, promocode=123)
-                login(request, user,
-                      backend='django.contrib.auth.backends.ModelBackend')
-                return redirect('index')
-            except ObjectDoesNotExist as error:
-                raise error
+            activate_user(request, form)
     form = CodeForm()
     return render(request, 'customer/activate_code.html', {'form': form})
 
@@ -109,7 +95,7 @@ def edit_profile(request):
     user_form = UserEditForm(instance=request.user)
     customer_form = ProfileEditForm(instance=request.user)
     return render(request, 'customer/edit_profile.html',
-                  {'user_form': user_form, 'profile_form': customer_form})
+                      {'user_form': user_form, 'profile_form': customer_form})
 
 
 @login_required
