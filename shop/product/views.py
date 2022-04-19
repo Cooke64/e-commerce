@@ -1,12 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 
 from cart.forms import CartAddProductForm
 from .forms import FeedbackForm, RateForm
 from .models import Product, Category, Feedback, Favorite
-from .services import get_product_list, get_detail_queryset
+from .services import get_product_list, save_feedback, save_score
 
 
 class SearchResultsView(ListView):
@@ -35,8 +35,9 @@ def product_list(request, cat_slug=None):
     cats = Category.objects.all()
     products = get_product_list(request)
     if cat_slug:
-        category = get_detail_queryset(Category, slug=cat_slug)
-        products = get_product_list(request, cat_slug=cat_slug, category=category)
+        category = get_object_or_404(Category, slug=cat_slug)
+        products = get_product_list(request, cat_slug=cat_slug,
+                                    category=category)
     else:
         category = None
     context = {
@@ -46,9 +47,7 @@ def product_list(request, cat_slug=None):
 
 
 def product_detail(request, product_slug: str):
-    product = (Product.objects
-               .select_related('category',).get(slug=product_slug)
-               )
+    product = Product.available_items.get(slug=product_slug)
     # Увеличиваем количество просмотров товара при каждом обращении
     product.view_count += 1
     product.save()
@@ -72,16 +71,10 @@ def product_detail(request, product_slug: str):
 @login_required(login_url='login_user')
 def add_feedback(request, product_slug):
     """Добавляем отзыв к продукту через пост запрос."""
-    product = get_detail_queryset(Product, slug=product_slug)
+    product = get_object_or_404(Product, slug=product_slug)
     form = FeedbackForm(request.POST or None)
     if form.is_valid():
-        try:
-            feedback = form.save(commit=False)
-            feedback.user = request.user
-            feedback.product = product
-            feedback.save()
-        except Exception as e:
-            raise e
+        save_feedback(request, form, product)
     return redirect('product_detail', product_slug=product_slug)
 
 
@@ -90,7 +83,7 @@ def favorites_items(request):
     """Отображения списка избранных товаров/продуктов."""
     user = request.user
     user_list = user.who_likes_items.values_list('product', flat=True)
-    favorite_items = Product.objects.select_related('category').filter(id__in=user_list)
+    favorite_items = Product.available_items.filter(id__in=user_list)
     context = {'favs': favorite_items}
     return render(request, "product/favorites.html", context)
 
@@ -100,11 +93,11 @@ def add_item_in_fav(request, product_slug: str):
     """Добавление товара в категорию избранные через проверку запроса
     к бд на существование у даннго юзера данного товара в избранных.
     """
-    fav_item = get_detail_queryset(Product, slug=product_slug)
-    is_exist = (Favorite.objects
-                .filter(user=request.user, product=fav_item)
-                .exists())
-    if not is_exist:
+    fav_item = get_object_or_404(Product, slug=product_slug)
+    fav_in_database = (Favorite.objects
+                       .filter(user=request.user, product=fav_item).exists()
+                       )
+    if not fav_in_database:
         Favorite.objects.get_or_create(
             user=request.user, product=fav_item
         )
@@ -114,8 +107,10 @@ def add_item_in_fav(request, product_slug: str):
 @login_required
 def stop_being_fav(request, product_slug: str):
     """Удаление товара из избранного."""
-    fav_item = get_detail_queryset(Product, slug=product_slug)
-    fav_in_database = Favorite.objects.filter(user=request.user, product=fav_item)
+    fav_item = get_object_or_404(Product, slug=product_slug)
+    fav_in_database = Favorite.objects.filter(
+        user=request.user, product=fav_item
+    )
     if fav_in_database.exists():
         fav_in_database.delete()
     return redirect('product_detail', product_slug=product_slug)
@@ -124,14 +119,7 @@ def stop_being_fav(request, product_slug: str):
 @login_required
 def add_score(request, product_slug: str):
     """Добавления рейтинга/лайков к конкретному товару."""
-    product = get_detail_queryset(Product, slug=product_slug)
+    product = get_object_or_404(Product, slug=product_slug)
     if request.method == 'POST':
-        try:
-            form = RateForm(request.POST)
-            score = form.save(commit=False)
-            score.user = request.user
-            score.product = product
-            score.save()
-        except Exception as e:
-            raise e
+        save_score(request, product)
         return redirect('product_detail', product_slug=product_slug)

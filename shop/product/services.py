@@ -1,46 +1,47 @@
-from django.shortcuts import get_object_or_404
-
+from product.forms import RateForm
 from product.models import Product
 
 
-def get_detail_queryset(model, slug):
-    """Функция получает объект с переданной в функцией моделью и slug"""
-    queryset = get_object_or_404(model, slug=slug)
-    return queryset
-
-
 def get_product_list(request, cat_slug=None, category=None):
-    products = (Product.objects.
-                select_related('category')
-                .filter(available=True)
-                )
+    """Функция возвращает различные query sets в зависимости
+     от запроса, переданная аргументов get-запроса."""
+    products = Product.available_items.all()
     if cat_slug:
-        products = (Product.objects
-                    .select_related('category')
-                    .filter(category=category)
-                    )
-
-    if "all_items" in request.GET:
+        products = Product.available_items.filter(category=category)
+    if "all_items" in request.GET or None in request.GET:
         # Сортировка всех доступных продуктов
-        products = (Product.objects.
-                    select_related('category')
-                    .filter(available=True)
-                    )
+        products = products
     elif "with_feeds" in request.GET:
         # Выбирает товары только с отзывами
-        products = (Product.objects
+        products = (Product.available_items
                     .filter(feedbacks__isnull=False)
                     .distinct())
     elif 'max_price' in request.GET:
         # Сортирует по максимальной цене
-        products = (Product.objects
-                    .order_by('-price')
-                    .select_related('category'))
+        products = Product.available_items.order_by('-price')
     elif 'min_price' in request.GET:
         # Сортирует по минимальной цене
-        products = (Product.objects
-                    .order_by('price')
-                    .select_related('category'))
+        products = Product.available_items.order_by('price')
     return products
 
 
+def save_feedback(request, form, product):
+    """Сохраняем отзыв к товару, отображенному функцией product_detail."""
+    try:
+        feedback = form.save(commit=False)
+        feedback.user = request.user
+        feedback.product = product
+        feedback.save()
+    except Exception as e:
+        raise e
+
+
+def save_score(request, product):
+    try:
+        form = RateForm(request.POST)
+        score = form.save(commit=False)
+        score.user = request.user
+        score.product = product
+        score.save()
+    except Exception as e:
+        raise e

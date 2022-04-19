@@ -30,6 +30,11 @@ RATE_CHOICES = [
 ]
 
 
+class ProductManager(models.Manager):
+    def get_available(self):
+        return super(ProductManager, self).get_queryset().select_related('category').filter(available=True)
+
+
 class Product(models.Model):
     """
     Модель товары в наличии.
@@ -80,6 +85,9 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    objects = models.Manager()
+    available_items = ProductManager()
 
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
@@ -172,6 +180,11 @@ class Feedback(models.Model):
 
     def __str__(self):
         return self.text[:50]
+
+
+class FavoriteManager(models.Manager):
+    def get_available(self, request, ):
+        return super(FavoriteManager, self).get_queryset().select_related('category').filter(available=True)
 
 
 class Favorite(models.Model):
