@@ -32,6 +32,7 @@ class SearchResultsView(ListView):
 
 
 def product_list(request, cat_slug=None):
+    """Отображаются все товары по определенному запосу, выбранному пользователем сайта."""
     cats = Category.objects.all()
     products = get_product_list(request)
     if cat_slug:

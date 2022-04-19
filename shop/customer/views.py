@@ -11,7 +11,7 @@ from customer.forms import (
     ProfileEditForm, CodeForm,
 )
 from customer.models import Customer, User
-from customer.services import generate_code, get_cleaned_data
+from customer.services import generate_code, make_login_user
 from mailing.tasks import send_confirm_messages, send_welcome_email
 from orders.models import Order
 
@@ -22,7 +22,7 @@ def login_user(request):
         return redirect('index')
     form = AuthenticationForm(request, data=request.POST)
     if form.is_valid():
-        get_cleaned_data(request, form)
+        make_login_user(request, form)
     return render(request, 'customer/login.html', {'form': form})
 
 
@@ -37,7 +37,6 @@ def signup(request):
     """
     if request.user.is_authenticated and request.user.is_active:
         return redirect('index')
-    signup_is_true = True
     form = UserRegisterForm()
     code = generate_code()
     if request.method == 'POST':
@@ -52,12 +51,13 @@ def signup(request):
             user.save()
             Customer.objects.create(user=user)
             # Task to celery mailing
-            send_confirm_messages.delay(username=user.username, email=user.email, code=code)
+            send_confirm_messages(username=user.username, email=user.email,
+                                  code=code)
             return redirect('confirm')
         else:
             messages.error(request, 'Something went wrong')
     context = {
-        'signup_is_true': signup_is_true,
+        'signup_is_true': True,
         'form': form
     }
     return render(request, 'customer/login.html', context)
@@ -76,8 +76,9 @@ def enter_code_to_confirm(request):
                 user.is_active = True
                 user.save()
                 # Task to celery mailing
-                send_welcome_email.delay(email=user.email, promocode=123)
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                send_welcome_email(email=user.email, promocode=123)
+                login(request, user,
+                      backend='django.contrib.auth.backends.ModelBackend')
                 return redirect('index')
             except ObjectDoesNotExist as error:
                 raise error
@@ -90,10 +91,7 @@ def user_profile(request):
     user = request.user
     cart = Cart(request)
     order = Order.objects.filter(customer=user)
-    context = {'user': user,
-               'cart': cart,
-               'order': order,
-               }
+    context = {'user': user, 'cart': cart, 'order': order}
     return render(request, 'customer/profile.html', context)
 
 
@@ -102,21 +100,24 @@ def edit_profile(request):
     if request.method == 'POST':
         user_form = UserEditForm(instance=request.user, data=request.POST)
         customer_form = ProfileEditForm(
-            instance=request.user.ustomer, data=request.POST)
+            instance=request.user.ustomer, data=request.POST
+        )
         if user_form.is_valid() and customer_form.is_valid():
             user_form.save()
             customer_form.save()
             return redirect('user_profile')
-    else:
-        user_form = UserEditForm(instance=request.user)
-        customer_form = ProfileEditForm(instance=request.user)
-        return render(request, 'customer/edit_profile.html',
-                      {'user_form': user_form, 'profile_form': customer_form})
+    user_form = UserEditForm(instance=request.user)
+    customer_form = ProfileEditForm(instance=request.user)
+    return render(request, 'customer/edit_profile.html',
+                  {'user_form': user_form, 'profile_form': customer_form})
 
 
 @login_required
 def delete_user_account(request, ):
     user_to_delete = get_object_or_404(User, id=request.user.id)
-    user_to_delete.delete()
-    messages.success(request, "Deleted")
-    return redirect('index')
+    try:
+        user_to_delete.delete()
+        messages.success(request, "Deleted")
+        return redirect('index')
+    except ObjectDoesNotExist as e:
+        raise e

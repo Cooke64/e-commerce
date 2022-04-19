@@ -15,7 +15,7 @@ def generate_code():
     return code_to
 
 
-def get_cleaned_data(request, form):
+def make_login_user(request, form):
     username = form.cleaned_data.get('username')
     password = form.cleaned_data.get('password')
     user = authenticate(request, username=username, password=password)

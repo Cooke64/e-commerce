@@ -1,6 +1,3 @@
-import datetime
-from datetime import timedelta, date
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST

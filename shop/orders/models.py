@@ -38,6 +38,7 @@ class Order(models.Model):
         return total_cost - total_cost * (self.discount / Decimal('100'))
 
     def save(self, *args, **kwargs):
+        """СОхраняем дату доставки."""
         self.will_be_delivered = datetime.now() + timedelta(3)
         super().save(*args, **kwargs)
 

@@ -182,11 +182,6 @@ class Feedback(models.Model):
         return self.text[:50]
 
 
-class FavoriteManager(models.Manager):
-    def get_available(self, request, ):
-        return super(FavoriteManager, self).get_queryset().select_related('category').filter(available=True)
-
-
 class Favorite(models.Model):
     """Избранные товары пользователя."""
     user = models.ForeignKey(
