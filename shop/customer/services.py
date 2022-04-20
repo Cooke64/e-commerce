@@ -45,3 +45,4 @@ def activate_user(request, form):
         return redirect('index')
     except ObjectDoesNotExist as error:
         raise error
+

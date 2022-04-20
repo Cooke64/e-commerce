@@ -73,6 +73,11 @@ class User(AbstractBaseUser):
         return self.admin
 
 
+class UserQueryManager(models.Manager):
+    def get_subscribed(self):
+        return super(UserQueryManager, self).select_related('users').get_queryset().filter(subscribed=True)
+
+
 class Customer(models.Model):
     """Модель покупателя с персональными данными."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -83,10 +88,13 @@ class Customer(models.Model):
     delivery_info = models.TextField('Доставка', null=True, blank=True,)
     spent_money = models.IntegerField('Потрачено денег', default=0)
     last_buy = models.DateField('Последний раз купил', null=True, blank=True)
-    promocode = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True,)
+    subscribed = models.BooleanField('Подписка на рассылку', default=True)
 
     def __str__(self):
         return self.first_name
+
+    subscribed_user = UserQueryManager()
+    objects = models.Manager()
 
     def get_discount(self):
         """Определяет размер скидки в зависимости от потраченных денег покупателем"""

@@ -107,3 +107,15 @@ def delete_user_account(request, ):
         return redirect('index')
     except ObjectDoesNotExist as e:
         raise e
+
+
+@login_required
+def stop_user_being_subscribed(request):
+    """Отменяем подписку на рассылку."""
+    user = get_object_or_404(User, id=request.user.id)
+    try:
+        user.subscribed = False
+        user.save()
+        return redirect('user_profile')
+    except ObjectDoesNotExist as e:
+        raise e

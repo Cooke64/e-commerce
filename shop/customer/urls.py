@@ -10,4 +10,5 @@ urlpatterns = [
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('delete_user_account/', views.delete_user_account, name='delete_user_account'),
     path('confirm/', views.enter_code_to_confirm, name='confirm'),
+    path('unsubscribe/', views.stop_user_being_subscribed, name='unsubscribe'),
 ]
