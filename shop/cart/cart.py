@@ -13,7 +13,7 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.coupon_id = self.session.get('coupon_id')
         if request.user.is_authenticated:
-            self.customer = request.user.customer
+            self.customer = request.user
         else:
             self.customer = None
         self.cart = cart

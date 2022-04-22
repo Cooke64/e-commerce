@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'api',
     'customer',
     'core',
-    'mailing'
+    'mailing',
+    'staff'
 
 ]
 

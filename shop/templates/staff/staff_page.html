@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+Управление продажами
+{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <div id="alert_box"></div>
+    <div id="img_box"></div>
+    <form id="my_form" autocomplete="off">
+        {% csrf_token %}
+        {{form|crispy }}
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+</div>
+{% endblock %}

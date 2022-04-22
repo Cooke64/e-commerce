@@ -8,14 +8,16 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="{% static 'css/star.css' %}">
+  <script src="{% static 'js/script.js' %}" defer></script>
 </head>
 <body>
 {% include 'includes/header.html' %}
 <form class="d-flex" action="{% url 'search_results' %}" method="get">
-        <input class="form-control me-2" name="q" type="text" aria-label="Search">
+        <input class="form-control me-2" name="q" type="text" aria-label="Search" id="search_here">
         <button class="btn btn-outline-secondary" type="submit">Искать</button>
 </form>
 <hr>
+<a href="{% url 'add_product' %}">Staff</a>
 {% if request.user.is_authenticated %}
 hello {{ request.user.username }}
 <a href="{% url 'logout_user' %}">Выйти</a>
