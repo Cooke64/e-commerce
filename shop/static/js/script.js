@@ -15,7 +15,7 @@ images.addEventListener('change', function(){
     let url = URL.createObjectURL(img_data)
     imgBox.innerHTML = `<img src="${url}" width="100%">`
 }) 
-
+console.log(idName.value)
 // при нажатии добавить формируем объект и добавляем туда неободимые значения из нашей формы, из переменных, которые получили выше
 form.addEventListener('submit', event=>{
     event.preventDefault()
@@ -33,13 +33,7 @@ form.addEventListener('submit', event=>{
         data: formData,
         success: function(response){
             handleAlerts('success', `Сохранено ${response.name}`)
-            setTimeout(()=>{
-                alertBox.innerHTML = ""
-                imgBox.innerHTML = ""
-                name.value = ""
-                description.value = ""
-                images.value = ""
-            }, 3000)
+            console.log(response.name)
         },
         error: function(error){
             handleAlerts('danger', 'Не сохранено. Какая-то ошибка')

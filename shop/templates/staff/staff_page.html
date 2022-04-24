@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
+{% block script%}{% static 'js/script.js' %}{% endblock %}
 {% block title %}
-Управление продажами
+{% if is_edit %}Редактировать продукт{% else %}Добавить продукт{% endif %}
 {% endblock %}
-
 {% block content %}
 <div class="mt-3">
     <div id="alert_box"></div>
@@ -11,7 +12,7 @@
     <form id="my_form" autocomplete="off">
         {% csrf_token %}
         {{form|crispy }}
-        <button type="submit" class="btn btn-primary">Добавить</button>
+        <button type="submit" class="btn btn-primary">{% if is_edit %} Сохранить {% else %} Добавить {% endif %}</button>
     </form>
 </div>
 {% endblock %}

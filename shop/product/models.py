@@ -1,7 +1,7 @@
 from customer.models import User
 from django.db import models
 from django.db.models import Avg
-
+from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 
@@ -99,6 +99,11 @@ class Product(models.Model):
         if avg_likes["result"] is not None:
             total = float(avg_likes["result"])
         return total
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            super(Product, self).save(*args, **kwargs)
 
 
 class Likes(models.Model):

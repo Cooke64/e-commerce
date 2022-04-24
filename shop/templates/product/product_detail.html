@@ -55,7 +55,7 @@
 {% if request.user.is_authenticated %}
 
 <h5 class="card-header">Добавить отзыв:</h5>
-    <form method="POST" action="{% url 'add_feedback' product.slug %}">
+    <form method="POST" action="{% url 'add_feedback' product.slug %}"zzz>
         {%csrf_token %}
         {{ feedback_form }}
         <hr>

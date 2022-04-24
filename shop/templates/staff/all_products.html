@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block script%} {% static 'js/product_list.js' %} {% endblock %}
+{% block title %}Все товары
+{% endblock %}
+{% block content %}
+  <div id="product-box"></div>
+  <div id="spinner-box"><div class="spinner-border" role="status"></div></div>
+  <div id="loading-box"><button class="btn btn-danger" id="butt">Click</button></div>
+{% endblock %}

@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
-{% load cache %}
 {% block title %}
 {% if category %}{{ category.name }}{% else %} Главная {% endif %}
 {% endblock %}
 {% block content %}
-{% cache 20 content %}
 <form action="/" method="GET">
     {% csrf_token %}
 <button class="btn btn-outline-secondary" id='all_items' name='all_items' type="submit">Все товары</button>
@@ -21,12 +19,22 @@
 <hr>
     {% endfor %}
 {% endif %}
-{% for item in products %}
-    <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
-    {{ item.price }}<br>
-    {% if item.image %}
-    <img src="{{ item.image.url }}" alt="">
-    {% endif %}
-{% endfor %}
-{% endcache %}
+<div id="product-box">
+    <div id="spinner-box">
+        <div id="loading-box">
+            <div class="spinner-border" role="status">
+             <span class="visually-hidden">Loading...</span>
+            </div></div>
+            {% for item in products %}
+                <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
+                {{ item.price }}<br>
+                {% if item.image %}
+                    <img src="{{ item.image.url }}" alt="">
+                {% endif %}
+            <hr>
+            {% endfor %}
+            <button class="btn btn-primary" id="butt">Смотреть больше</button>
+
+    </div>
+</div>
 {% endblock %}

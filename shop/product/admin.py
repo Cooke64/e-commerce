@@ -13,9 +13,8 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
     )
     search_fields = ('name', 'brand', 'price')
-    list_editable = ('category',)
     prepopulated_fields = {'slug': ('name',)}
-    empty_value_display = '-пусто-'
+    empty_value_display = 'не указано'
 
 
 @admin.register(Category)
