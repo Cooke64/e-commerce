@@ -14,12 +14,14 @@ Login
 <h5>
  {% for item in order %}
  {{ item.will_be_delivered }}
- <hr>
+   <hr>
  {% endfor %}
 </h5>
 <a href="{% url 'cart_detail' %}">К корзине</a>
 <a href="{% url 'favorites_items' %}">Избранное</a>
 <a href="{% url 'edit_profile' %}">Изменить профиль</a>
 <a href="{% url 'delete_user_account' %}">Удалить профиль</a>
-<a href="{% url 'unsubscribe' %}">Отписаться от подписки</a>
+{% if user.customer.subscribed %}
+<a href="{% url 'unsubscribe' %}">Отписаться от рассылки</a>
+{% endif %}
 {% endblock %}

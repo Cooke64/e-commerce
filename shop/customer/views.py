@@ -50,7 +50,7 @@ def signup(request):
             user.is_active = False
             user.code = code
             user.save()
-            Customer.objects.create(user=user)
+            Customer.objects.create(user_id=user)
             # Task to celery mailing
             send_confirm_messages(username=user.username, email=user.email, code=code)
             return redirect('confirm')
@@ -68,6 +68,7 @@ def enter_code_to_confirm(request):
         form = CodeForm(request.POST)
         if form.is_valid():
             activate_user(request, form)
+            return redirect('profile')
     form = CodeForm()
     return render(request, 'customer/activate_code.html', {'form': form})
 
@@ -77,7 +78,7 @@ def user_profile(request):
     user = request.user
     cart = Cart(request)
     order = Order.objects.filter(customer=user)
-    context = {'user': user, 'cart': cart, 'order': order}
+    context = {'user': user, 'cart': cart, 'order': order,}
     return render(request, 'customer/profile.html', context)
 
 
@@ -112,7 +113,8 @@ def delete_user_account(request, ):
 @login_required
 def stop_user_being_subscribed(request):
     """Отменяем подписку на рассылку."""
-    user = get_object_or_404(User, id=request.user.id)
+    user = get_object_or_404(Customer, user_id=request.user)
+    print(user)
     try:
         user.subscribed = False
         user.save()

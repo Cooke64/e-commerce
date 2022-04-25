@@ -2,8 +2,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 
-from coupons.models import Coupon
-
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
@@ -41,9 +39,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     username = models.CharField(max_length=30, unique=True)
-    email = models.EmailField(
-        'Email', max_length=255, unique=True,
-    )
+    email = models.EmailField('Email', max_length=255, unique=True,)
     is_active = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
@@ -80,7 +76,7 @@ class UserQueryManager(models.Manager):
 
 class Customer(models.Model):
     """Модель покупателя с персональными данными."""
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     first_name = models.CharField(max_length=30, blank=True, null=True)
     second_name = models.CharField(max_length=30, blank=True, null=True)
     phone = models.CharField(max_length=30, null=True, blank=True,)
@@ -90,11 +86,11 @@ class Customer(models.Model):
     last_buy = models.DateField('Последний раз купил', null=True, blank=True)
     subscribed = models.BooleanField('Подписка на рассылку', default=True)
 
-    def __str__(self):
-        return self.first_name
-
     subscribed_user = UserQueryManager()
     objects = models.Manager()
+
+    def __str__(self):
+        return f'{self.user}'
 
     def get_discount(self):
         """Определяет размер скидки в зависимости от потраченных денег покупателем"""

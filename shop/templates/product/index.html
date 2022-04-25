@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block script%} {% static 'js/product_detail.js' %} {% endblock %}
 {% block title %}
 {% if category %}{{ category.name }}{% else %} Главная {% endif %}
 {% endblock %}
@@ -12,29 +14,17 @@
 </form>
 <a href="{% url 'index' %}">Главная</a>
 <hr>
-{% if request.user.is_authenticated %}
     {% for cat in cats %}
     <a href="{{ cat.get_absolute_url }}">{{ cat.name }}
     </a>
 <hr>
     {% endfor %}
-{% endif %}
-<div id="product-box">
-    <div id="spinner-box">
-        <div id="loading-box">
-            <div class="spinner-border" role="status">
-             <span class="visually-hidden">Loading...</span>
-            </div></div>
             {% for item in products %}
+                {% if item.images %}
+                <div id="img"></div>
+                {% endif %}
                 <a href="{{ item.get_absolute_url }}">{{ item.name }}<br></a>
                 {{ item.price }}<br>
-                {% if item.image %}
-                    <img src="{{ item.image.url }}" alt="">
-                {% endif %}
             <hr>
             {% endfor %}
-            <button class="btn btn-primary" id="butt">Смотреть больше</button>
-
-    </div>
-</div>
 {% endblock %}

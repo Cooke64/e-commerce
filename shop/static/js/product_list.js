@@ -11,11 +11,10 @@ const handlData = () =>{
             let data = response.data
             let maxSize = response.max
             data.map(product => {
-                let slug = product.slug
                 productBox.innerHTML += `<div class="card mt-3 p-3 mb-3">
                 <h3>${product.name}</h3>
                 <h4 style="color: red">${product.price}</h4>
-                <a href="http://127.0.0.1:8000/staff/edit_product/${slug}">Подробнее</a><br>
+                <a href="edit_product/${product.slug}">Редактировать</a><br>
                 </div>`
             })
             if(maxSize){

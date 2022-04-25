@@ -1,7 +1,7 @@
 import random
 import string
 
-from core.services import send_email, generate_promocode
+from core.services import send_email
 from customer.models import Customer
 from mailing.models import Mailing
 from shop.celery import app
@@ -16,7 +16,7 @@ def generate_code():
     return code_to
 
 
-CODE = generate_promocode()
+CODE = generate_code()
 UNSUBSCRIBE = 'ссылка для перехода для отписки от рассылки'
 
 

@@ -15,7 +15,6 @@ images.addEventListener('change', function(){
     let url = URL.createObjectURL(img_data)
     imgBox.innerHTML = `<img src="${url}" width="100%">`
 }) 
-console.log(idName.value)
 // при нажатии добавить формируем объект и добавляем туда неободимые значения из нашей формы, из переменных, которые получили выше
 form.addEventListener('submit', event=>{
     event.preventDefault()
