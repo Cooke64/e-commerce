@@ -11,6 +11,9 @@ class ProductView(TemplateView):
 
 
 def get_json_response(*args, **kwargs):
+    """Получаем запрос по pk продукта, далее получаем
+    количество всех товаров и отправляем данные о количестве и списке продуктов.
+    """
     visibility = 3
     upper = kwargs.get('product_pk')
     lower = upper - visibility
@@ -21,27 +24,28 @@ def get_json_response(*args, **kwargs):
 
 
 def product_add(request):
+    """Функция принимает ajax запрос через форму и сохраняет полученные данные.
+    Возвращает при валидной форме ответ с сохраннеными данными.
+    """
     form = ProductForm(request.POST or None, request.FILES or None)
     data = {}
     if request.is_ajax() and form.is_valid():
         form.save()
         data['name'] = form.cleaned_data.get('name')
-        data['status'] = 'ok'
         return JsonResponse(data)
     context = {'form': form}
     return render(request, 'staff/staff_page.html', context)
 
 
 def edit_product(request, product_slug):
+    """Редактирование продукта через ajax запрос."""
     product = Product.available_items.get(slug=product_slug)
     form = ProductForm(
-        request.POST or None, files=request.FILES or None, instance=product
-    )
+        request.POST or None, files=request.FILES or None, instance=product)
     data = {}
     if form.is_valid():
         form.save()
         data['name'] = form.cleaned_data.get('name')
-        data['status'] = 'ok'
         return JsonResponse(data)
     context = {'form': form, 'is_edit': True}
     return render(request, 'staff/staff_page.html', context)

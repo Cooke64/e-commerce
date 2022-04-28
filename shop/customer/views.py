@@ -11,14 +11,15 @@ from customer.forms import (
     ProfileEditForm, CodeForm,
 )
 from customer.models import Customer, User
-from customer.services import generate_code, make_login_user, activate_user
+from customer.services import generate_code, make_login_user, activate_user, \
+    save_user
 from mailing.tasks import send_confirm_messages, send_welcome_email
 from orders.models import Order
 
 
 def login_user(request):
     """Аутентификация пользователя."""
-    if request.user.is_authenticated and request.user.is_active:
+    if request.user.is_authenticated or request.user.is_active:
         return redirect('index')
     form = AuthenticationForm(request, data=request.POST)
     if form.is_valid():
@@ -35,7 +36,7 @@ def signup(request):
     """Регистрация пользователя. Дополнительно создается
     профиль пользователя, который он сможет редактировать.
     """
-    if request.user.is_authenticated and request.user.is_active:
+    if request.user.is_authenticated or request.user.is_active:
         return redirect('index')
     form = UserRegisterForm()
     # Создаем код для подтверждения по емейлу
@@ -44,16 +45,7 @@ def signup(request):
         form = UserRegisterForm(request.POST or None)
         if form.is_valid():
             user = form.save(commit=False)
-            user.username = user.username
-            if user.is_admin and user.is_staff:
-                user.is_active = True
-            user.is_active = False
-            user.code = code
-            user.save()
-            Customer.objects.create(user_id=user)
-            # Task to celery mailing
-            send_confirm_messages(username=user.username, email=user.email, code=code)
-            return redirect('confirm')
+            save_user(user, code)
         else:
             messages.error(request, 'Something went wrong')
     context = {'signup_is_true': True, 'form': form}
@@ -68,7 +60,6 @@ def enter_code_to_confirm(request):
         form = CodeForm(request.POST)
         if form.is_valid():
             activate_user(request, form)
-            return redirect('profile')
     form = CodeForm()
     return render(request, 'customer/activate_code.html', {'form': form})
 
@@ -76,9 +67,8 @@ def enter_code_to_confirm(request):
 @login_required(login_url='login_user')
 def user_profile(request):
     user = request.user
-    cart = Cart(request)
     order = Order.objects.filter(customer=user)
-    context = {'user': user, 'cart': cart, 'order': order,}
+    context = {'user': user, 'cart': Cart(request), 'order': order}
     return render(request, 'customer/profile.html', context)
 
 
@@ -103,8 +93,8 @@ def edit_profile(request):
 def delete_user_account(request, ):
     user_to_delete = get_object_or_404(User, id=request.user.id)
     try:
-        user_to_delete.delete()
-        messages.success(request, "Deleted")
+        user_to_delete.is_active = False
+        user_to_delete.save()
         return redirect('index')
     except ObjectDoesNotExist as e:
         raise e
@@ -114,7 +104,6 @@ def delete_user_account(request, ):
 def stop_user_being_subscribed(request):
     """Отменяем подписку на рассылку."""
     user = get_object_or_404(Customer, user_id=request.user)
-    print(user)
     try:
         user.subscribed = False
         user.save()

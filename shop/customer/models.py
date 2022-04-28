@@ -122,3 +122,4 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         Customer.objects.create(user=instance)
     instance.customer.save()
+

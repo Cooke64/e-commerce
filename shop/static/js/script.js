@@ -43,6 +43,6 @@ form.addEventListener('submit', event=>{
         })
     })
 
-    let handleAlerts = (type, text) =>{
+let handleAlerts = (type, text) =>{
         alertBox.innerHTML = `<div class="alert alert-${type}" role="alert">${text}</div>`
     }

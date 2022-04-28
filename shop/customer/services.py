@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.shortcuts import redirect
 
 from customer.models import User
-from mailing.tasks import send_welcome_email
+from mailing.tasks import send_welcome_email, send_confirm_messages
 
 
 def generate_code():
@@ -46,3 +46,13 @@ def activate_user(request, form):
     except ObjectDoesNotExist as error:
         raise error
 
+
+def save_user(user, code):
+    user.username = user.username
+    if user.is_admin and user.is_staff:
+        user.is_active = True
+    user.is_active = False
+    user.code = code
+    user.save()
+    send_confirm_messages(username=user.username, email=user.email, code=code)
+    return redirect('confirm')

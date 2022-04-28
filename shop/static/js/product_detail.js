@@ -11,14 +11,15 @@ $.ajax(
                 console.log(element.fields)
                 if ( element.fields.images){
                     imgDiv.innerHTML+=`
-                    <a href='#' data-bs-toggle="modal" data-bs-target="#preview"><img style="width:300px; height: 30px" src="media/${ element.fields.images }"></a>`
+                    <a href='#' data-bs-toggle="modal" data-bs-target="#preview">
+                    <img style="width:300px; height: 30px" src="media/${ element.fields.images }"></a>`
                 
                 }
 
             });
         },
         error: (error) => {
-            
+            console.log('какая-то ошибка')
         }
     }
 )

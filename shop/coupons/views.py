@@ -29,8 +29,7 @@ def generate_promocode():
     """Создает промокод для скидки."""
     code = generate_code()
     try:
-        Coupon.objects.create(code=code,
-)
+        Coupon.objects.create(code=code,)
         return code
     except ObjectDoesNotExist as e:
         raise e
