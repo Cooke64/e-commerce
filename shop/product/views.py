@@ -1,16 +1,11 @@
-import json
-
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.db.models import Q
-from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
 from django.views.generic import ListView
 
 from cart.forms import CartAddProductForm
 from .forms import FeedbackForm, RateForm
-from .models import Product, Category, Feedback, Favorite
+from .models import Product, Category
 from .services import get_product_list, save_feedback, save_score, \
     get_product_and_add_views, get_feedback_and_fav, \
     check_product_in_fave_list, get_fav_items

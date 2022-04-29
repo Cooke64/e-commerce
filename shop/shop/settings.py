@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'social_django',
+    'djoser',
+    'rest_framework_simplejwt',
 
     'product',
     'cart',
@@ -38,7 +40,8 @@ INSTALLED_APPS = [
     'customer',
     'core',
     'mailing',
-    'staff'
+    'staff',
+    'usersapi'
 
 ]
 
@@ -147,7 +150,10 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

@@ -1,5 +1,6 @@
 import random
 import string
+from smtplib import SMTPException
 
 from django.conf import settings
 from django.core.mail import EmailMessage
@@ -16,9 +17,12 @@ def generate_code():
 
 def send_email(email, message):
     """Отправляет сообщение на емейл при завершении заказа."""
-    email = EmailMessage(
-        body=message,
-        from_email=settings.EMAIL_HOST_USER,
-        to=[f'{email}']
-    )
-    return email.send()
+    try:
+        email = EmailMessage(
+            body=message,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[f'{email}']
+        )
+        return email.send()
+    except SMTPException as e:
+        raise

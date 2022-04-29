@@ -13,7 +13,6 @@ from customer.forms import (
 from customer.models import Customer, User
 from customer.services import generate_code, make_login_user, activate_user, \
     save_user
-from mailing.tasks import send_confirm_messages, send_welcome_email
 from orders.models import Order
 
 
